@@ -7,11 +7,8 @@ from textual.binding import Binding
 
 song = ''
 
-def song_playing():
-    player = vlc.MediaPlayer(song)
-    return player
-
-player = song_playing()
+def song_playing(song):
+    return vlc.MediaPlayer(song)
 
 class MyApp(App):
     """Lysn"""
@@ -45,16 +42,16 @@ class MyApp(App):
 
     def action_playsong(self) -> None:
         self.text.update(f"song playing: {song}.")
-        player = song_playing()
-        player.play()
+        self.player = song_playing(song)
+        self.player.play()
 
     def action_stopsong(self) -> None:
-        self.text.update(f"song playing: {song}.")
-        player.stop()
+        self.text.update(f"song STOPED: {song}.")
+        self.player.stop()
 
     def action_pausesong(self) -> None:
-        self.text.update(f"song playing: {song}.")
-        player.pause()
+        self.text.update(f"song PAUSED: {song}.")
+        self.player.pause()
 
 if __name__ == "__main__":
     app = MyApp()
