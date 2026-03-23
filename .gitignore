@@ -1,0 +1,17 @@
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+
+# Bytecode
+__pycache__/
+*.pyc
+
+# Test files
+test.py
+/songs
