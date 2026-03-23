@@ -29,7 +29,10 @@ class MyApp(App):
         Binding("q", "quit", "Quit"),
         Binding("e", "playsong", "Play Song"),
         Binding("s", "stopsong", "Stop Song"),
-        Binding("p", "pausesong", "Pause Song"),
+        Binding("space", "pausesong", "Pause Song"),
+        Binding("r", "restartsong", "Restart Song"),
+        Binding("rigt", "seeksong", "Seek 10 sec"),
+        Binding("left", "backsong", "Go back 10 sec"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -52,6 +55,18 @@ class MyApp(App):
     def action_pausesong(self) -> None:
         self.text.update(f"song PAUSED: {song}.")
         self.player.pause()
+
+    def action_restartsong(self) -> None:
+        self.text.update(f"song PAUSED: {song}.")
+        self.player.set_time(0)
+
+    def action_seeksong(self) -> None:
+        self.text.update(f"song PAUSED: {song}.")
+        self.player.set_time(player.get_time() + 10000)
+
+    def action_backsong(self) -> None:
+        self.text.update(f"song PAUSED: {song}.")
+        self.player.set_time(player.get_time() - 10000)
 
 if __name__ == "__main__":
     app = MyApp()
