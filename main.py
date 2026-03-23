@@ -10,7 +10,7 @@ song = '/home/wattox/Documents/cli_music_player/songs/3.m4a'
 def song_playing(song):
     return vlc.MediaPlayer(song)
 
-class MyApp(App):
+class Lysn(App):
     """Lysn"""
 
     CSS = """
@@ -36,7 +36,8 @@ class MyApp(App):
         Binding("left", "backwardsong", "Go back 10 sec"),
         # Volume control
         Binding("up", "volumeup", "Volume Up"),
-        Binding("down", "volumedown", "VolumeDown"),
+        Binding("down", "volumedown", "Volume Down"),
+        Binding("m", "volumemute", "Mute"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -83,7 +84,11 @@ class MyApp(App):
         self.text.update(f"song volume down: {song}.")
         self.player.audio_set_volume(self.volume-5)
 
+    def action_volumemute(self) -> None:
+        self.text.update(f"song mute: {song}.")
+        self.player.audio_toggle_mute()
+
 if __name__ == "__main__":
-    app = MyApp()
+    app = Lysn()
     app.run()
 
