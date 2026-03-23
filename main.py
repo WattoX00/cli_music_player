@@ -27,12 +27,16 @@ class MyApp(App):
 
     BINDINGS = [
         Binding("q", "quit", "Quit"),
+        # Song keybinds
         Binding("e", "playsong", "Play Song"),
         Binding("s", "stopsong", "Stop Song"),
         Binding("space", "pausesong", "Pause Song"),
         Binding("r", "restartsong", "Restart Song"),
         Binding("right", "forwardsong", "Seek 10 sec"),
         Binding("left", "backwardsong", "Go back 10 sec"),
+        # Volume control
+        Binding("up", "volumeup", "Volume Up"),
+        Binding("down", "volumedown", "VolumeDown"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -46,6 +50,9 @@ class MyApp(App):
     def action_playsong(self) -> None:
         self.text.update(f"song playing: {song}.")
         self.player = song_playing(song)
+
+        self.volume = 90
+        self.player.audio_set_volume(self.volume)
         self.player.play()
 
     def action_stopsong(self) -> None:
@@ -67,6 +74,14 @@ class MyApp(App):
     def action_backwardsong(self) -> None:
         self.text.update(f"song Backwarded: {song}.")
         self.player.set_time(self.player.get_time() - 10000)
+
+    def action_volumeup(self) -> None:
+        self.text.update(f"song volume up: {song}.")
+        self.player.audio_set_volume(self.volume+5)
+
+    def action_volumedown(self) -> None:
+        self.text.update(f"song volume down: {song}.")
+        self.player.audio_set_volume(self.volume-5)
 
 if __name__ == "__main__":
     app = MyApp()
