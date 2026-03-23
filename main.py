@@ -1,11 +1,12 @@
 import vlc
-import time
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static
 from textual.containers import Container
 from textual.binding import Binding
 
-song = '/home/wattox/Documents/cli_music_player/songs/3.m4a'
+folder = '/home/wattox/Documents/cli_music_player/songs/'
+
+song = folder+'3.m4a'
 
 def song_playing(song):
     return vlc.MediaPlayer(song)
