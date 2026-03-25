@@ -100,6 +100,11 @@ class Lysn(App):
         self.refresh_list()
         self.refresh_browser()
         self.set_interval(1, self.check_song_end)
+        self.sc_user = "your_username"
+        self.sc_set = "your_playlist"
+        self.input_mode = None
+        self.input_buffer = ""
+        self.pending_action = None
 
     def get_active_tab(self):
         tabs = self.query_one("#tabs", TabbedContent)
@@ -211,24 +216,23 @@ class Lysn(App):
             if label == "SoundCloud":
                 self.browser_mode = "soundcloud_menu"
                 self.refresh_browser()
-            elif label == "Spotify":
-                self.player_text.update("Spotify not implemented")
 
         elif self.browser_mode == "soundcloud_menu":
+            username = getattr(self, "sc_user", "your_username")
+            setname = getattr(self, "sc_set", "your_playlist")
+
             if label == "Likes":
-                username = input("SoundCloud username: ")
+                self.player_text.update("Downloading likes...")
                 run_likes(username)
                 self.player_text.update(f"Downloaded likes for {username}")
 
             elif label == "Albums":
-                username = input("Username: ")
-                setname = input("Album name: ")
+                self.player_text.update("Downloading album...")
                 run_playlist(username, setname, False)
                 self.player_text.update(f"Downloaded album {setname}")
 
             elif label == "Playlists":
-                username = input("Username: ")
-                setname = input("Playlist name: ")
+                self.player_text.update("Downloading playlist...")
                 run_playlist(username, setname, True)
                 self.player_text.update(f"Downloaded playlist {setname}")
 
