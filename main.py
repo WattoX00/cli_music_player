@@ -57,12 +57,11 @@ class Lysn(App):
         Binding("s", "stopsong", "Stop Song"),
         Binding("space", "pausesong", "Pause Song"),
         Binding("r", "restartsong", "Restart Song"),
-        Binding("right", "forwardsong", "Seek 10 sec"),
-        Binding("left", "backwardsong", "Go back 10 sec"),
-        Binding("up", "volumeup", "Volume Up"),
-        Binding("down", "volumedown", "Volume Down"),
+        Binding("d", "forwardsong", "Seek 10 sec"),
+        Binding("a", "backwardsong", "Go back 10 sec"),
+        Binding("w", "volumeup", "Volume Up"),
+        Binding("x", "volumedown", "Volume Down"),
         Binding("m", "volumemute", "Mute"),
-        # Album navigation
         Binding("enter", "open_item", "Open"),
         Binding("backspace", "go_back", "Back"),
         Binding("p", "play_album", "Play Album"),
@@ -95,6 +94,7 @@ class Lysn(App):
         self.current_path = MUSIC_DIR
         self.history = []
         self.refresh_list()
+        self.set_interval(1, self.check_song_end)
 
     def refresh_list(self):
         self.album_list.clear()
@@ -108,7 +108,8 @@ class Lysn(App):
         if self.album_list.index is None:
             return
 
-        selected = list(self.current_path.iterdir())[self.album_list.index]
+        items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
+        selected = items[self.album_list.index]
 
         if selected.is_dir():
             self.history.append(self.current_path)
