@@ -50,7 +50,7 @@ def likes_url(username: str) -> str:
 
 def playlist_url(username: str, set_name: str, is_user_playlist: bool = False) -> str:
     if is_user_playlist:
-        return f"https://soundcloud.com/playlist-{username}/sets/{set_name}"
+        return f"https://soundcloud.com/{username}/sets/{set_name}"
     return f"https://soundcloud.com/{username}/sets/{set_name}"
 
 
