@@ -16,6 +16,8 @@ from textual.widgets import (
 from textual.containers import Container
 from textual.binding import Binding
 
+from browse.soundcloud import run_likes, run_playlist
+
 MUSIC_DIR = Path.home() / "Music"
 
 
@@ -74,13 +76,14 @@ class Lysn(App):
         yield Header()
 
         with Container(id="main"):
-            with TabbedContent():
-                with TabPane("Albums"):
+            with TabbedContent(id="tabs"):
+                with TabPane("Albums", id="albums_tab"):
                     self.album_list = ListView()
                     yield self.album_list
 
-                with TabPane("Browse"):
-                    yield Static("Browse tab content", classes="tab-box")
+                with TabPane("Browse", id="browse_tab"):
+                    self.browser_list = ListView()
+                    yield self.browser_list
 
                 with TabPane("Help"):
                     yield Static("Help tab content", classes="tab-box")
@@ -93,41 +96,20 @@ class Lysn(App):
     def on_mount(self) -> None:
         self.current_path = MUSIC_DIR
         self.history = []
+        self.browser_mode = "root"
         self.refresh_list()
+        self.refresh_browser()
         self.set_interval(1, self.check_song_end)
 
+    def get_active_tab(self):
+        tabs = self.query_one("#tabs", TabbedContent)
+        return tabs.active
+
+    #Player
     def check_song_end(self):
         if hasattr(self, "player") and hasattr(self, "playlist"):
             if self.player.get_state() == vlc.State.Ended:
                 self.action_next_song()
-
-    def refresh_list(self):
-        self.album_list.clear()
-        items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
-
-        for item in items:
-            label = f"[DIR] {item.name}" if item.is_dir() else item.name
-            self.album_list.append(ListItem(Label(label)))
-
-    def action_open_item(self) -> None:
-        if self.album_list.index is None:
-            return
-
-        items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
-        selected = items[self.album_list.index]
-
-        if selected.is_dir():
-            self.history.append(self.current_path)
-            self.current_path = selected
-            self.refresh_list()
-
-    def action_go_back(self) -> None:
-        if self.history:
-            self.current_path = self.history.pop()
-            self.refresh_list()
-
-    def get_album_songs(self):
-        return [f for f in self.current_path.iterdir() if f.is_file()]
 
     def play_song_list(self, songs):
         if not songs:
@@ -152,6 +134,41 @@ class Lysn(App):
         self.player.play()
         self.player_text.update(f"Playing: {song.name}")
 
+    #Album Nav
+    def refresh_list(self):
+        self.album_list.clear()
+        items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
+
+        for item in items:
+            label = f"[DIR] {item.name}" if item.is_dir() else item.name
+            self.album_list.append(ListItem(Label(label)))
+
+    def open_album_item(self):
+        if self.album_list.index is None:
+            return
+
+        items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
+        selected = items[self.album_list.index]
+
+        if selected.is_dir():
+            self.history.append(self.current_path)
+            self.current_path = selected
+            self.refresh_list()
+
+    def action_go_back(self) -> None:
+        if self.get_active_tab() == "albums_tab":
+            if self.history:
+                self.current_path = self.history.pop()
+                self.refresh_list()
+
+        elif self.get_active_tab() == "browse_tab":
+            if self.browser_mode != "root":
+                self.browser_mode = "root"
+                self.refresh_browser()
+
+    def get_album_songs(self):
+        return [f for f in self.current_path.iterdir() if f.is_file()]
+
     def action_play_album(self) -> None:
         if self.current_path == MUSIC_DIR:
             return
@@ -166,6 +183,55 @@ class Lysn(App):
         songs = self.get_album_songs()
         random.shuffle(songs)
         self.play_song_list(songs)
+
+    #Browse
+    def refresh_browser(self):
+        self.browser_list.clear()
+
+        if self.browser_mode == "root":
+            options = ["SoundCloud", "Spotify"]
+        elif self.browser_mode == "soundcloud":
+            options = ["Likes", "Playlist"]
+        else:
+            options = []
+
+        for opt in options:
+            self.browser_list.append(ListItem(Label(opt)))
+
+    def open_browser_item(self):
+        if self.browser_list.index is None:
+            return
+
+        label_widget = self.browser_list.get_child_at_index(self.browser_list.index).query_one(Label)
+        label = str(label_widget.renderable)
+
+        if self.browser_mode == "root":
+            if label == "SoundCloud":
+                self.browser_mode = "soundcloud"
+                self.refresh_browser()
+            elif label == "Spotify":
+                self.player_text.update("Spotify not implemented")
+
+        elif self.browser_mode == "soundcloud":
+            if label == "Likes":
+                username = input("SoundCloud username: ")
+                run_likes(username)
+                self.player_text.update(f"Downloaded likes for {username}")
+
+            elif label == "Playlist":
+                username = input("Username: ")
+                setname = input("Playlist name: ")
+                is_user = input("Is user playlist? (y/n): ").lower() == "y"
+                run_playlist(username, setname, is_user)
+                self.player_text.update(f"Downloaded playlist {setname}")
+
+    def action_open_item(self) -> None:
+        if self.get_active_tab() == "albums_tab":
+            self.open_album_item()
+        elif self.get_active_tab() == "browse_tab":
+            self.open_browser_item()
+
+    #Player hotkeys
 
     def action_playsong(self) -> None:
         self.play_current_song()
