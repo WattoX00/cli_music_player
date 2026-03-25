@@ -218,23 +218,23 @@ class Lysn(App):
                 self.refresh_browser()
 
         elif self.browser_mode == "soundcloud_menu":
-            username = getattr(self, "sc_user", "your_username")
-            setname = getattr(self, "sc_set", "your_playlist")
-
             if label == "Likes":
-                self.player_text.update("Downloading likes...")
-                run_likes(username)
-                self.player_text.update(f"Downloaded likes for {username}")
+                self.input_mode = "username"
+                self.pending_action = "likes"
+                self.input_buffer = ""
+                self.player_text.update("Enter username:")
 
             elif label == "Albums":
-                self.player_text.update("Downloading album...")
-                run_playlist(username, setname, False)
-                self.player_text.update(f"Downloaded album {setname}")
+                self.input_mode = "username"
+                self.pending_action = "album"
+                self.input_buffer = ""
+                self.player_text.update("Enter username:")
 
             elif label == "Playlists":
-                self.player_text.update("Downloading playlist...")
-                run_playlist(username, setname, True)
-                self.player_text.update(f"Downloaded playlist {setname}")
+                self.input_mode = "username"
+                self.pending_action = "playlist"
+                self.input_buffer = ""
+                self.player_text.update("Enter username:")
 
     def action_open_item(self) -> None:
         if self.get_active_tab() == "albums_tab":
@@ -309,6 +309,47 @@ class Lysn(App):
 
         self.play_current_song()
 
+    # prompt typing
+    def on_key(self, event):
+        if not self.input_mode:
+            return
+
+        if event.key == "enter":
+            if self.input_mode == "username":
+                self.temp_username = self.input_buffer
+                self.input_buffer = ""
+
+                if self.pending_action == "likes":
+                    self.player_text.update("Downloading likes...")
+                    run_likes(self.temp_username)
+                    self.player_text.update(f"Done: {self.temp_username}")
+                    self.input_mode = None
+
+                else:
+                    self.input_mode = "setname"
+                    self.player_text.update("Enter name:")
+
+            elif self.input_mode == "setname":
+                setname = self.input_buffer
+                self.input_buffer = ""
+
+                self.player_text.update("Downloading...")
+                run_playlist(
+                    self.temp_username,
+                    setname,
+                    self.pending_action == "playlist"
+                )
+                self.player_text.update(f"Done: {setname}")
+
+                self.input_mode = None
+
+        elif event.key == "backspace":
+            self.input_buffer = self.input_buffer[:-1]
+
+        elif event.character:
+            self.input_buffer += event.character
+
+        self.player_text.update(f"> {self.input_buffer}")
 if __name__ == "__main__":
     app = Lysn()
     app.run()
