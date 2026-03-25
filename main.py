@@ -162,7 +162,7 @@ class Lysn(App):
                 self.refresh_list()
 
         elif self.get_active_tab() == "browse_tab":
-            if self.browser_mode != "root":
+            if self.browser_mode == "soundcloud_menu":
                 self.browser_mode = "root"
                 self.refresh_browser()
 
@@ -190,39 +190,46 @@ class Lysn(App):
 
         if self.browser_mode == "root":
             options = ["SoundCloud", "Spotify"]
-        elif self.browser_mode == "soundcloud":
-            options = ["Likes", "Playlist"]
+        elif self.browser_mode == "soundcloud_menu":
+            options = ["Likes", "Albums", "Playlists"]
         else:
             options = []
 
         for opt in options:
-            self.browser_list.append(ListItem(Label(opt)))
+            item = ListItem(Label(opt))
+            item.data = opt  # <-- STORE VALUE HERE
+            self.browser_list.append(item)
 
     def open_browser_item(self):
         if self.browser_list.index is None:
             return
 
-        label_widget = self.browser_list.get_child_at_index(self.browser_list.index).query_one(Label)
-        label = str(label_widget.renderable)
+        item = self.browser_list.children[self.browser_list.index]
+        label = item.data
 
         if self.browser_mode == "root":
             if label == "SoundCloud":
-                self.browser_mode = "soundcloud"
+                self.browser_mode = "soundcloud_menu"
                 self.refresh_browser()
             elif label == "Spotify":
                 self.player_text.update("Spotify not implemented")
 
-        elif self.browser_mode == "soundcloud":
+        elif self.browser_mode == "soundcloud_menu":
             if label == "Likes":
                 username = input("SoundCloud username: ")
                 run_likes(username)
                 self.player_text.update(f"Downloaded likes for {username}")
 
-            elif label == "Playlist":
+            elif label == "Albums":
+                username = input("Username: ")
+                setname = input("Album name: ")
+                run_playlist(username, setname, False)
+                self.player_text.update(f"Downloaded album {setname}")
+
+            elif label == "Playlists":
                 username = input("Username: ")
                 setname = input("Playlist name: ")
-                is_user = input("Is user playlist? (y/n): ").lower() == "y"
-                run_playlist(username, setname, is_user)
+                run_playlist(username, setname, True)
                 self.player_text.update(f"Downloaded playlist {setname}")
 
     def action_open_item(self) -> None:
