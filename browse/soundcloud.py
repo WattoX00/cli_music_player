@@ -7,19 +7,16 @@ from yt_dlp import YoutubeDL
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def load_set(path):
     if os.path.exists(path):
         with open(path) as f:
             return set(x.strip() for x in f if x.strip())
     return set()
 
-
 def append_lines(path, lines):
     with open(path, "a") as f:
         for line in lines:
             f.write(line + "\n")
-
 
 def extract_entries(url):
     ydl_opts = {
@@ -43,24 +40,19 @@ def extract_entries(url):
 
     return urls
 
-
 def likes_url(username: str) -> str:
     return f"https://soundcloud.com/{username}/likes"
-
 
 def playlist_url(username: str, set_name: str, is_user_playlist: bool = False) -> str:
     if is_user_playlist:
         return f"https://soundcloud.com/{username}/sets/{set_name}"
     return f"https://soundcloud.com/{username}/sets/{set_name}"
 
-
 def extract_likes(username: str):
     return extract_entries(likes_url(username))
 
-
 def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     return extract_entries(playlist_url(username, set_name, is_user_playlist))
-
 
 def download_urls(urls):
     downloaded = load_set("downloaded.txt")
