@@ -75,15 +75,15 @@ class Lysn(App):
 
         with Container(id="main"):
             with TabbedContent():
-                with TabPane("Download"):
-                    yield Static("Download tab content", classes="tab-box")
-
                 with TabPane("Albums"):
                     self.album_list = ListView()
                     yield self.album_list
 
-                with TabPane("Guide"):
-                    yield Static("Guide tab content", classes="tab-box")
+                with TabPane("Browse"):
+                    yield Static("Browse tab content", classes="tab-box")
+
+                with TabPane("Help"):
+                    yield Static("Help tab content", classes="tab-box")
 
         self.player_text = Static("No song playing", id="player_bar")
         yield self.player_text
