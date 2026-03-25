@@ -248,19 +248,28 @@ class Lysn(App):
         self.play_current_song()
 
     def action_stopsong(self) -> None:
-        if hasattr(self, "player"):
-            self.player.stop()
-        self.player_text.update("Stopped")
+        try:
+            if hasattr(self, "player"):
+                self.player.stop()
+            self.player_text.update("Stopped")
+        except:
+            pass
 
     def action_pausesong(self) -> None:
-        if hasattr(self, "player"):
-            self.player.pause()
-        self.player_text.update("Paused")
+        try:
+            if hasattr(self, "player"):
+                self.player.pause()
+            self.player_text.update("Paused")
+        except:
+            pass
 
     def action_restartsong(self) -> None:
-        if hasattr(self, "player"):
-            self.player.set_time(0)
-        self.player_text.update("Restarted")
+        try:
+            if hasattr(self, "player"):
+                self.player.set_time(0)
+            self.player_text.update("Restarted")
+        except:
+            pass
 
     def action_forwardsong(self) -> None:
         if hasattr(self, "player"):
@@ -273,21 +282,30 @@ class Lysn(App):
         self.player_text.update("Back 10s")
 
     def action_volumeup(self) -> None:
-        if hasattr(self, "player"):
-            self.volume += 5
-            self.player.audio_set_volume(self.volume)
-        self.player_text.update(f"Volume: {self.volume}")
+        try:
+            if hasattr(self, "player"):
+                self.volume += 5
+                self.player.audio_set_volume(self.volume)
+            self.player_text.update(f"Volume: {self.volume}")
+        except:
+            pass
 
     def action_volumedown(self) -> None:
-        if hasattr(self, "player"):
-            self.volume -= 5
-            self.player.audio_set_volume(self.volume)
-        self.player_text.update(f"Volume: {self.volume}")
+        try:
+            if hasattr(self, "player"):
+                self.volume -= 5
+                self.player.audio_set_volume(self.volume)
+            self.player_text.update(f"Volume: {self.volume}")
+        except:
+            pass
 
     def action_volumemute(self) -> None:
-        if hasattr(self, "player"):
-            self.player.audio_toggle_mute()
-        self.player_text.update("Muted toggle")
+        try:
+            if hasattr(self, "player"):
+                self.player.audio_toggle_mute()
+            self.player_text.update("Muted toggle")
+        except:
+            pass
 
     def action_next_song(self) -> None:
         if not hasattr(self, "playlist") or not self.playlist:
@@ -350,6 +368,7 @@ class Lysn(App):
             self.input_buffer += event.character
 
         self.player_text.update(f"> {self.input_buffer}")
+
 if __name__ == "__main__":
     app = Lysn()
     app.run()
