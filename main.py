@@ -96,6 +96,11 @@ class Lysn(App):
         self.refresh_list()
         self.set_interval(1, self.check_song_end)
 
+    def check_song_end(self):
+        if hasattr(self, "player") and hasattr(self, "playlist"):
+            if self.player.get_state() == vlc.State.Ended:
+                self.action_next_song()
+
     def refresh_list(self):
         self.album_list.clear()
         items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
@@ -137,8 +142,12 @@ class Lysn(App):
             return
 
         song = self.playlist[self.current_index]
+
+        if hasattr(self, "player"):
+            self.player.stop()
+
         self.player = song_playing(song)
-        self.volume = 90
+        self.volume = getattr(self, "volume", 90)
         self.player.audio_set_volume(self.volume)
         self.player.play()
         self.player_text.update(f"Playing: {song.name}")
@@ -203,6 +212,25 @@ class Lysn(App):
             self.player.audio_toggle_mute()
         self.player_text.update("Muted toggle")
 
+    def action_next_song(self) -> None:
+        if not hasattr(self, "playlist") or not self.playlist:
+            return
+
+        self.current_index += 1
+        if self.current_index >= len(self.playlist):
+            self.current_index = 0
+
+        self.play_current_song()
+
+    def action_prev_song(self) -> None:
+        if not hasattr(self, "playlist") or not self.playlist:
+            return
+
+        self.current_index -= 1
+        if self.current_index < 0:
+            self.current_index = len(self.playlist) - 1
+
+        self.play_current_song()
 
 if __name__ == "__main__":
     app = Lysn()
