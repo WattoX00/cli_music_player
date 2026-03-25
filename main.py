@@ -1,14 +1,26 @@
 import vlc
+import random
+from pathlib import Path
+
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Static, TabbedContent, TabPane
+from textual.widgets import (
+    Header,
+    Footer,
+    Static,
+    TabbedContent,
+    TabPane,
+    ListView,
+    ListItem,
+    Label,
+)
 from textual.containers import Container
 from textual.binding import Binding
 
-folder = '/home/wattox/Documents/lysn/songs/'
-song = folder + '3.m4a'
+MUSIC_DIR = Path.home() / "Music"
+
 
 def song_playing(song):
-    return vlc.MediaPlayer(song)
+    return vlc.MediaPlayer(str(song))
 
 
 class Lysn(App):
@@ -50,6 +62,13 @@ class Lysn(App):
         Binding("up", "volumeup", "Volume Up"),
         Binding("down", "volumedown", "Volume Down"),
         Binding("m", "volumemute", "Mute"),
+        # Album navigation
+        Binding("enter", "open_item", "Open"),
+        Binding("backspace", "go_back", "Back"),
+        Binding("p", "play_album", "Play Album"),
+        Binding("z", "shuffle_album", "Shuffle Album"),
+        Binding("n", "next_song", "Next Song"),
+        Binding("b", "prev_song", "Previous Song"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -58,40 +77,103 @@ class Lysn(App):
         with Container(id="main"):
             with TabbedContent():
                 with TabPane("Download"):
-                    yield Static("Download tab content", classes="tab-box", id="download_tab")
+                    yield Static("Download tab content", classes="tab-box")
 
                 with TabPane("Albums"):
-                    yield Static("Albums tab content", classes="tab-box", id="albums_tab")
+                    self.album_list = ListView()
+                    yield self.album_list
 
                 with TabPane("Guide"):
-                    yield Static("Guide tab content", classes="tab-box", id="guide_tab")
+                    yield Static("Guide tab content", classes="tab-box")
 
         self.player_text = Static("No song playing", id="player_bar")
         yield self.player_text
 
         yield Footer()
 
-    def action_playsong(self) -> None:
+    def on_mount(self) -> None:
+        self.current_path = MUSIC_DIR
+        self.history = []
+        self.refresh_list()
+
+    def refresh_list(self):
+        self.album_list.clear()
+        items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
+
+        for item in items:
+            label = f"[DIR] {item.name}" if item.is_dir() else item.name
+            self.album_list.append(ListItem(Label(label)))
+
+    def action_open_item(self) -> None:
+        if self.album_list.index is None:
+            return
+
+        selected = list(self.current_path.iterdir())[self.album_list.index]
+
+        if selected.is_dir():
+            self.history.append(self.current_path)
+            self.current_path = selected
+            self.refresh_list()
+
+    def action_go_back(self) -> None:
+        if self.history:
+            self.current_path = self.history.pop()
+            self.refresh_list()
+
+    def get_album_songs(self):
+        return [f for f in self.current_path.iterdir() if f.is_file()]
+
+    def play_song_list(self, songs):
+        if not songs:
+            return
+
+        self.playlist = songs
+        self.current_index = 0
+        self.play_current_song()
+
+    def play_current_song(self):
+        if not hasattr(self, "playlist") or not self.playlist:
+            return
+
+        song = self.playlist[self.current_index]
         self.player = song_playing(song)
         self.volume = 90
         self.player.audio_set_volume(self.volume)
         self.player.play()
-        self.player_text.update(f"Playing: {song}")
+        self.player_text.update(f"Playing: {song.name}")
+
+    def action_play_album(self) -> None:
+        if self.current_path == MUSIC_DIR:
+            return
+
+        songs = sorted(self.get_album_songs())
+        self.play_song_list(songs)
+
+    def action_shuffle_album(self) -> None:
+        if self.current_path == MUSIC_DIR:
+            return
+
+        songs = self.get_album_songs()
+        random.shuffle(songs)
+        self.play_song_list(songs)
+
+    def action_playsong(self) -> None:
+        self.play_current_song()
 
     def action_stopsong(self) -> None:
         if hasattr(self, "player"):
             self.player.stop()
-        self.player_text.update(f"Stopped: {song}")
+        self.player_text.update("Stopped")
 
     def action_pausesong(self) -> None:
         if hasattr(self, "player"):
             self.player.pause()
-        self.player_text.update(f"Paused: {song}")
+        self.player_text.update("Paused")
 
     def action_restartsong(self) -> None:
         if hasattr(self, "player"):
             self.player.set_time(0)
-        self.player_text.update(f"Restarted: {song}")
+        self.player_text.update("Restarted")
 
     def action_forwardsong(self) -> None:
         if hasattr(self, "player"):
