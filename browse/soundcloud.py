@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import sys
 import time
 import logging
 from yt_dlp import YoutubeDL
@@ -45,15 +44,30 @@ def extract_entries(url):
     return urls
 
 
-def main(likes_url):
+def likes_url(username: str) -> str:
+    return f"https://soundcloud.com/{username}/likes"
+
+
+def playlist_url(username: str, set_name: str, is_user_playlist: bool = False) -> str:
+    if is_user_playlist:
+        return f"https://soundcloud.com/playlist-{username}/sets/{set_name}"
+    return f"https://soundcloud.com/{username}/sets/{set_name}"
+
+
+def extract_likes(username: str):
+    return extract_entries(likes_url(username))
+
+
+def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
+    return extract_entries(playlist_url(username, set_name, is_user_playlist))
+
+
+def download_urls(urls):
     downloaded = load_set("downloaded.txt")
     ignored = load_set("ignored.txt")
     seen = downloaded | ignored
 
-    logger.info("Extracting liked tracks...")
-    all_urls = extract_entries(likes_url)
-
-    urls = [u for u in all_urls if u not in seen]
+    urls = [u for u in urls if u not in seen]
 
     if not urls:
         logger.info("No new tracks")
@@ -90,9 +104,12 @@ def main(likes_url):
                 f.write(f"{url}\n{err}\n\n")
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <likes_url>")
-        sys.exit(1)
+def run_likes(username: str):
+    logger.info(f"Fetching likes for: {username}")
+    urls = extract_likes(username)
+    download_urls(urls)
 
-    main(sys.argv[1])
+def run_playlist(username: str, set_name: str, is_user_playlist: bool = False):
+    logger.info(f"Fetching playlist: {username} / {set_name}")
+    urls = extract_playlist(username, set_name, is_user_playlist)
+    download_urls(urls)
