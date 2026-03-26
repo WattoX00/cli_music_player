@@ -78,7 +78,7 @@ def download_urls(urls, folder_name: str):
         return
 
     ydl_opts = {
-        "outtmpl": str(target_dir / "%(uploader)s - %(title)s (%(id)s).%(ext)s"),
+        "outtmpl": str(target_dir / "%(uploader)s - %(title)s"),
         "format": "bestaudio/best",
         "quiet": True,
         "noplaylist": True,
