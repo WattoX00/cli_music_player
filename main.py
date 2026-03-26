@@ -100,7 +100,8 @@ class Lysn(App):
         self.refresh_list()
         self.refresh_browser()
         self.set_interval(1, self.check_song_end)
-        self.set_interval(0.5, self.update_player_bar)
+        self.set_interval(1, self.update_player_bar)
+        self.muted = False
         self.sc_user = "your_username"
         self.sc_set = "your_playlist"
         self.input_mode = None
@@ -277,13 +278,25 @@ class Lysn(App):
 
             time_str = f"{fmt(current)} / {fmt(total)}"
 
+        # volume
+        vol = getattr(self, "volume", 0)
+        muted = getattr(self, "muted", False)
+
+        if muted:
+            vol_str = "MUTED"
+        else:
+            bar_len = 10
+            filled = int((vol / 100) * bar_len)
+            vol_bar = "|" * filled + "." * (bar_len - filled)
+            vol_str = f"{vol:3}% [{vol_bar}]"
+
         # song name
         if hasattr(self, "playlist"):
             song = self.playlist[self.current_index].name
         else:
             song = "No song"
 
-        self.player_text.update(f"{icon} {song} {progress_bar} {time_str}")
+        self.player_text.update(f"{icon} {song[:25]:25} {progress_bar} {time_str}  {vol_str}")
 
     #Player hotkeys
 
@@ -311,24 +324,19 @@ class Lysn(App):
             self.player.set_time(self.player.get_time() - 10000)
 
     def action_volumeup(self) -> None:
-        try:
-            if hasattr(self, "player"):
-                self.volume += 5
-                self.player.audio_set_volume(self.volume)
-        except:
-            pass
+        if hasattr(self, "player"):
+            self.volume = min(self.volume + 5, 100)
+            self.player.audio_set_volume(self.volume)
 
     def action_volumedown(self) -> None:
-        try:
-            if hasattr(self, "player"):
-                self.volume -= 5
-                self.player.audio_set_volume(self.volume)
-        except:
-            pass
+        if hasattr(self, "player"):
+            self.volume = max(self.volume - 5, 0)
+            self.player.audio_set_volume(self.volume)
 
     def action_volumemute(self) -> None:
         if hasattr(self, "player"):
-            self.player.audio_toggle_mute()
+            self.muted = not self.muted
+            self.player.audio_set_mute(self.muted)
 
     def action_next_song(self) -> None:
         if not hasattr(self, "playlist") or not self.playlist:
