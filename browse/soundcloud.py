@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
-import os
 import time
 import logging
+from pathlib import Path
 from yt_dlp import YoutubeDL
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-def load_set(path):
-    if os.path.exists(path):
-        with open(path) as f:
+BASE_DIR = Path.home() / "Music"
+
+def load_set(path: Path):
+    if path.exists():
+        with path.open() as f:
             return set(x.strip() for x in f if x.strip())
     return set()
 
-def append_lines(path, lines):
-    with open(path, "a") as f:
+def append_lines(path: Path, lines):
+    with path.open("a") as f:
         for line in lines:
             f.write(line + "\n")
 
@@ -44,8 +46,6 @@ def likes_url(username: str) -> str:
     return f"https://soundcloud.com/{username}/likes"
 
 def playlist_url(username: str, set_name: str, is_user_playlist: bool = False) -> str:
-    if is_user_playlist:
-        return f"https://soundcloud.com/{username}/sets/{set_name}"
     return f"https://soundcloud.com/{username}/sets/{set_name}"
 
 def extract_likes(username: str):
@@ -54,9 +54,21 @@ def extract_likes(username: str):
 def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     return extract_entries(playlist_url(username, set_name, is_user_playlist))
 
-def download_urls(urls):
-    downloaded = load_set("downloaded.txt")
-    ignored = load_set("ignored.txt")
+def get_folder_name(is_likes: bool, set_name: str = None):
+    if is_likes:
+        return "likes"
+    return set_name
+
+def download_urls(urls, folder_name: str):
+    target_dir = BASE_DIR / folder_name
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    downloaded_file = target_dir / "downloaded.txt"
+    ignored_file = target_dir / "ignored.txt"
+    errors_file = target_dir / "errors.txt"
+
+    downloaded = load_set(downloaded_file)
+    ignored = load_set(ignored_file)
     seen = downloaded | ignored
 
     urls = [u for u in urls if u not in seen]
@@ -65,10 +77,8 @@ def download_urls(urls):
         logger.info("No new tracks")
         return
 
-    os.makedirs("songs", exist_ok=True)
-
     ydl_opts = {
-        "outtmpl": "songs/%(uploader)s - %(title)s (%(id)s).%(ext)s",
+        "outtmpl": str(target_dir / "%(uploader)s - %(title)s (%(id)s).%(ext)s"),
         "format": "bestaudio/best",
         "quiet": True,
         "noplaylist": True,
@@ -87,10 +97,10 @@ def download_urls(urls):
                 failed.append((url, str(e)))
             time.sleep(1)
 
-    append_lines("downloaded.txt", success)
+    append_lines(downloaded_file, success)
 
     if failed:
-        with open("errors.txt", "a") as f:
+        with errors_file.open("a") as f:
             f.write(f"\n\nRun @ {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
             for url, err in failed:
                 f.write(f"{url}\n{err}\n\n")
@@ -99,9 +109,11 @@ def download_urls(urls):
 def run_likes(username: str):
     logger.info(f"Fetching likes for: {username}")
     urls = extract_likes(username)
-    download_urls(urls)
+    folder = get_folder_name(is_likes=True)
+    download_urls(urls, folder)
 
 def run_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     logger.info(f"Fetching playlist: {username} / {set_name}")
     urls = extract_playlist(username, set_name, is_user_playlist)
-    download_urls(urls)
+    folder = get_folder_name(is_likes=False, set_name=set_name)
+    download_urls(urls, folder)
