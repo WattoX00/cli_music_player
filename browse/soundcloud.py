@@ -54,9 +54,9 @@ def extract_likes(username: str):
 def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     return extract_entries(playlist_url(username, set_name, is_user_playlist))
 
-def get_folder_name(is_likes: bool, set_name: str = None):
+def get_folder_name(username: str, is_likes: bool, set_name: str = None):
     if is_likes:
-        return "likes"
+        return f"{username}-likes"
     return set_name
 
 def download_urls(urls, folder_name: str):
@@ -109,11 +109,11 @@ def download_urls(urls, folder_name: str):
 def run_likes(username: str):
     logger.info(f"Fetching likes for: {username}")
     urls = extract_likes(username)
-    folder = get_folder_name(is_likes=True)
+    folder = get_folder_name(username, is_likes=True)
     download_urls(urls, folder)
 
 def run_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     logger.info(f"Fetching playlist: {username} / {set_name}")
     urls = extract_playlist(username, set_name, is_user_playlist)
-    folder = get_folder_name(is_likes=False, set_name=set_name)
+    folder = get_folder_name(username, is_likes=False, set_name=set_name)
     download_urls(urls, folder)
