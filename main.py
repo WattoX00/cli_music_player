@@ -100,6 +100,7 @@ class Lysn(App):
         self.refresh_list()
         self.refresh_browser()
         self.set_interval(1, self.check_song_end)
+        self.set_interval(0.5, self.update_player_bar)
         self.sc_user = "your_username"
         self.sc_set = "your_playlist"
         self.input_mode = None
@@ -202,7 +203,7 @@ class Lysn(App):
 
         for opt in options:
             item = ListItem(Label(opt))
-            item.data = opt  # <-- STORE VALUE HERE
+            item.data = opt
             self.browser_list.append(item)
 
     def open_browser_item(self):
@@ -242,6 +243,48 @@ class Lysn(App):
         elif self.get_active_tab() == "browse_tab":
             self.open_browser_item()
 
+    # Player bar
+    def update_player_bar(self):
+        if not hasattr(self, "player"):
+            return
+
+        state = self.player.get_state()
+
+        # icon
+        if state == vlc.State.Playing:
+            icon = ">"
+        elif state == vlc.State.Paused:
+            icon = "|"
+        else:
+            icon = "|"
+
+        # time
+        current = self.player.get_time() // 1000
+        total = self.player.get_length() // 1000
+
+        if total <= 0:
+            progress_bar = "[----------]"
+            time_str = "00:00 / 00:00"
+        else:
+            progress = current / total
+            bar_length = 20
+            filled = int(progress * bar_length)
+
+            progress_bar = "[" + "=" * filled + "-" * (bar_length - filled) + "]"
+
+            def fmt(t):
+                return f"{t//60:02}:{t%60:02}"
+
+            time_str = f"{fmt(current)} / {fmt(total)}"
+
+        # song name
+        if hasattr(self, "playlist"):
+            song = self.playlist[self.current_index].name
+        else:
+            song = "No song"
+
+        self.player_text.update(f"{icon} {song} {progress_bar} {time_str}")
+
     #Player hotkeys
 
     def action_playsong(self) -> None:
@@ -250,34 +293,28 @@ class Lysn(App):
     def action_stopsong(self) -> None:
         if hasattr(self, "player"):
             self.player.stop()
-        self.player_text.update("Stopped")
 
     def action_pausesong(self) -> None:
         if hasattr(self, "player"):
             self.player.pause()
-        self.player_text.update("Paused")
 
     def action_restartsong(self) -> None:
         if hasattr(self, "player"):
             self.player.set_time(0)
-        self.player_text.update("Restarted")
 
     def action_forwardsong(self) -> None:
         if hasattr(self, "player"):
             self.player.set_time(self.player.get_time() + 10000)
-        self.player_text.update("Forward 10s")
 
     def action_backwardsong(self) -> None:
         if hasattr(self, "player"):
             self.player.set_time(self.player.get_time() - 10000)
-        self.player_text.update("Back 10s")
 
     def action_volumeup(self) -> None:
         try:
             if hasattr(self, "player"):
                 self.volume += 5
                 self.player.audio_set_volume(self.volume)
-            self.player_text.update(f"Volume: {self.volume}")
         except:
             pass
 
@@ -286,14 +323,12 @@ class Lysn(App):
             if hasattr(self, "player"):
                 self.volume -= 5
                 self.player.audio_set_volume(self.volume)
-            self.player_text.update(f"Volume: {self.volume}")
         except:
             pass
 
     def action_volumemute(self) -> None:
         if hasattr(self, "player"):
             self.player.audio_toggle_mute()
-        self.player_text.update("Muted toggle")
 
     def action_next_song(self) -> None:
         if not hasattr(self, "playlist") or not self.playlist:
