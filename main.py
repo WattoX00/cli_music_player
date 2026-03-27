@@ -55,7 +55,6 @@ class Lysn(App):
 
     BINDINGS = [
         Binding("q", "quit", "Quit"),
-        Binding("e", "playsong", "Play Song"),
         Binding("s", "stopsong", "Stop Song"),
         Binding("space", "pausesong", "Pause Song"),
         Binding("r", "restartsong", "Restart Song"),
