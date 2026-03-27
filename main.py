@@ -291,10 +291,8 @@ class Lysn(App):
         if hasattr(self, "playlist"):
             song = self.playlist[self.current_index].name
 
-        # LINE 1 → song + state
         line1 = f"{icon} {song[:40]}"
 
-        # LINE 2 → progress + time + volume
         line2 = f"[{bar}] {time_str}   {vol_str}"
 
         self.player_text.update(f"{line1}\n{line2}")
