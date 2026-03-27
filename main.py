@@ -30,6 +30,8 @@ class Lysn(App):
     CSS = """
     Screen {
         layout: vertical;
+        background: #0b0f14;
+        color: #d0d7de;
     }
 
     #main {
@@ -41,16 +43,16 @@ class Lysn(App):
     }
 
     .tab-box {
-        border: round green;
+        border: round #30363d;
         padding: 1 2;
     }
 
     #player_bar {
         height: 4;
-        border-top: solid green;
+        border-top: solid #30363d;
         padding: 0 1;
-        background: #111;
-        color: #0f0;
+        background: #0b0f14;
+        color: #c9d1d9;
     }
     """
 
