@@ -69,7 +69,6 @@ class Lysn(App):
         Binding("n", "next_song", "Next Song"),
         Binding("b", "prev_song", "Previous Song"),
         Binding("down", "focus_tab_content", "Enter Tab"),
-        Binding("up", "focus_tabs", "Back to Tabs"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -201,9 +200,6 @@ class Lysn(App):
         elif event.list_view is self.browser_list:
             self.open_browser_item()
 
-    def action_focus_tabs(self):
-        self.query_one("#tabs").focus()
-        
     #Browse
     def refresh_browser(self):
         self.browser_list.clear()
