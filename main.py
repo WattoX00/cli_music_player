@@ -2,7 +2,9 @@ import vlc
 import random
 from pathlib import Path
 
+from textual.binding import Binding
 from textual.app import App, ComposeResult
+from textual.containers import Container, VerticalScroll
 from textual.widgets import (
     Header,
     Static,
@@ -12,10 +14,6 @@ from textual.widgets import (
     ListItem,
     Label,
 )
-from textual.containers import Container
-from textual.binding import Binding
-from textual.containers import VerticalScroll
-from textual.widgets import Static
 
 from browse.soundcloud import run_likes, run_playlist
 
@@ -50,13 +48,15 @@ class Lysn(App):
     }
 
     .tab-box, .list-view {
-        background: #0b0f14;  /* dark background */
+        background: #0b0f14;
         color: #d0d7de;
     }
+    
     .list-view {
-    height: 1fr;   /* fill container */
-}
-#player_bar {
+        height: 1fr;
+    }
+
+    #player_bar {
         height: 4;
         border-top: solid #30363d;
         padding: 0 1;
@@ -198,7 +198,7 @@ https://github.com/wattox00/lysn
         self.player.play()
         self.player_text.update(f"Playing: {song.name}")
 
-    #Album Nav
+    # Album Nav
     def refresh_list(self):
         self.album_list.clear()
         items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
@@ -260,7 +260,7 @@ https://github.com/wattox00/lysn
         elif event.list_view is self.browser_list:
             self.open_browser_item()
 
-    #Browse
+    # Browse
     def refresh_browser(self):
         self.browser_list.clear()
 
