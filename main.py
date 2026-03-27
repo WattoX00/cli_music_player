@@ -46,9 +46,11 @@ class Lysn(App):
     }
 
     #player_bar {
-        height: 3;
+        height: 4;
         border-top: solid green;
         padding: 0 1;
+        background: #111;
+        color: #0f0;
     }
     """
 
@@ -260,54 +262,41 @@ class Lysn(App):
 
         state = self.player.get_state()
 
-        # icon
-        if state == vlc.State.Playing:
-            icon = ">"
-        elif state == vlc.State.Paused:
-            icon = "|"
-        else:
-            icon = "|"
+        icon = {
+            vlc.State.Playing: "▶",
+            vlc.State.Paused: "⏸",
+        }.get(state, "■")
 
-        # time
-        current = self.player.get_time() // 1000
-        total = self.player.get_length() // 1000
+        current = max(0, self.player.get_time() // 1000)
+        total = max(1, self.player.get_length() // 1000)
 
-        if total <= 0:
-            progress_bar = "[----------]"
-            time_str = "00:00 / 00:00"
-        else:
-            progress = current / total
-            bar_length = 20
-            filled = int(progress * bar_length)
+        progress = current / total
+        bar_len = 30
+        filled = int(progress * bar_len)
 
-            progress_bar = "[" + "=" * filled + "-" * (bar_length - filled) + "]"
+        bar = "█" * filled + "░" * (bar_len - filled)
 
-            def fmt(t):
-                return f"{t//60:02}:{t%60:02}"
+        def fmt(t):
+            return f"{t//60:02}:{t%60:02}"
 
-            time_str = f"{fmt(current)} / {fmt(total)}"
+        time_str = f"{fmt(current)} / {fmt(total)}"
 
-        # volume
         vol = getattr(self, "volume", 0)
         muted = getattr(self, "muted", False)
+        vol_str = "🔇" if muted else f"🔊 {vol}%"
 
-        if muted:
-            vol_str = "MUTED"
-        else:
-            bar_len = 10
-            filled = int((vol / 100) * bar_len)
-            vol_bar = "|" * filled + "." * (bar_len - filled)
-            vol_str = f"{vol:3}% [{vol_bar}]"
-
-        # song name
+        song = "No song"
         if hasattr(self, "playlist"):
             song = self.playlist[self.current_index].name
-        else:
-            song = "No song"
 
-        self.player_text.update(f"{icon} {song[:25]:25} {progress_bar} {time_str}  {vol_str}")
+        # LINE 1 → song + state
+        line1 = f"{icon} {song[:40]}"
 
-    #Player hotkeys
+        # LINE 2 → progress + time + volume
+        line2 = f"[{bar}] {time_str}   {vol_str}"
+
+        self.player_text.update(f"{line1}\n{line2}")
+
 
     def action_playsong(self) -> None:
         self.play_current_song()
