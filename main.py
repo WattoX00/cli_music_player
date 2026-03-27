@@ -265,9 +265,9 @@ class Lysn(App):
         state = self.player.get_state()
 
         icon = {
-            vlc.State.Playing: "▶",
-            vlc.State.Paused: "⏸",
-        }.get(state, "■")
+            vlc.State.Playing: "›",
+            vlc.State.Paused: "‖",
+        }.get(state, "·")
 
         current = max(0, self.player.get_time() // 1000)
         total = max(1, self.player.get_length() // 1000)
@@ -276,7 +276,7 @@ class Lysn(App):
         bar_len = 30
         filled = int(progress * bar_len)
 
-        bar = "█" * filled + "░" * (bar_len - filled)
+        bar = "─" * filled + " " * (bar_len - filled)
 
         def fmt(t):
             return f"{t//60:02}:{t%60:02}"
@@ -285,7 +285,7 @@ class Lysn(App):
 
         vol = getattr(self, "volume", 0)
         muted = getattr(self, "muted", False)
-        vol_str = "🔇" if muted else f"🔊 {vol}%"
+        vol_str = "MUTE" if muted else f"VOL {vol:02}"
 
         song = "No song"
         if hasattr(self, "playlist"):
@@ -298,7 +298,6 @@ class Lysn(App):
         line2 = f"[{bar}] {time_str}   {vol_str}"
 
         self.player_text.update(f"{line1}\n{line2}")
-
 
     def action_playsong(self) -> None:
         self.play_current_song()
