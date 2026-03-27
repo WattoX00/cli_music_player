@@ -60,20 +60,25 @@ class Lysn(App):
 
     BINDINGS = [
         Binding("q", "quit", "Quit"),
-        Binding("s", "stopsong", "Stop Song"),
+        Binding("enter", "open_item", "Open"),
+        Binding("backspace", "go_back", "Back"),
+        # Playback controls
         Binding("space", "pausesong", "Pause Song"),
+        Binding("s", "stopsong", "Stop Song"),
         Binding("r", "restartsong", "Restart Song"),
+        Binding("n", "next_song", "Next Song"),
+        Binding("b", "prev_song", "Previous Song"),
+        # Seeking
         Binding("d", "forwardsong", "Seek 10 sec"),
         Binding("a", "backwardsong", "Go back 10 sec"),
+        # Volume
         Binding("w", "volumeup", "Volume Up"),
         Binding("x", "volumedown", "Volume Down"),
         Binding("m", "volumemute", "Mute"),
-        Binding("enter", "open_item", "Open"),
-        Binding("backspace", "go_back", "Back"),
+        # Album action
         Binding("p", "play_album", "Play Album"),
         Binding("z", "shuffle_album", "Shuffle Album"),
-        Binding("n", "next_song", "Next Song"),
-        Binding("b", "prev_song", "Previous Song"),
+
         Binding("down", "focus_tab_content", "Enter Tab"),
     ]
 
@@ -128,7 +133,8 @@ QUIT
 ----
 [Q]            Exit application
 
-[ more help sections coming soon... ]
+FOR MORE CHECK OUT THE FULL DOCUMENTATION ON:
+https://github.com/wattox00/lysn
             """,
                             classes="tab-box",
                             markup=False,
