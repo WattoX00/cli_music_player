@@ -5,7 +5,6 @@ from pathlib import Path
 from textual.app import App, ComposeResult
 from textual.widgets import (
     Header,
-    Footer,
     Static,
     TabbedContent,
     TabPane,
@@ -89,8 +88,6 @@ class Lysn(App):
 
         self.player_text = Static("No song playing", id="player_bar")
         yield self.player_text
-
-        yield Footer()
 
     def on_mount(self) -> None:
         self.current_path = MUSIC_DIR
