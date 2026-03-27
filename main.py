@@ -14,6 +14,8 @@ from textual.widgets import (
 )
 from textual.containers import Container
 from textual.binding import Binding
+from textual.containers import VerticalScroll
+from textual.widgets import Static
 
 from browse.soundcloud import run_likes, run_playlist
 
@@ -89,7 +91,48 @@ class Lysn(App):
                     yield self.browser_list
 
                 with TabPane("Help"):
-                    yield Static("Help tab content", classes="tab-box")
+                    with VerticalScroll():
+                        yield Static(
+            """
+NAVIGATION
+----------
+[↑ / ↓]        Move selection
+[Enter]        Open item / Confirm
+[Backspace]    Go back
+
+PLAYBACK CONTROLS
+-----------------
+[Space]        Pause / Resume
+[S]            Stop
+[R]            Restart song
+[N]            Next song
+[B]            Previous song
+
+SEEKING
+-------
+[D]            Forward 10 seconds
+[A]            Backward 10 seconds
+
+VOLUME
+------
+[W]            Volume up
+[X]            Volume down
+[M]            Mute toggle
+
+ALBUM ACTIONS
+-------------
+[P]            Play album
+[Z]            Shuffle album
+
+QUIT
+----
+[Q]            Exit application
+
+[ more help sections coming soon... ]
+            """,
+                            classes="tab-box",
+                            markup=False,
+                        )
 
         self.player_text = Static("No song playing", id="player_bar")
         yield self.player_text
@@ -137,7 +180,7 @@ class Lysn(App):
             self.player.stop()
 
         self.player = song_playing(song)
-        self.volume = getattr(self, "volume", 90)
+        self.volume = getattr(self, "volume", 50)
         self.player.audio_set_volume(self.volume)
         self.player.play()
         self.player_text.update(f"Playing: {song.name}")
