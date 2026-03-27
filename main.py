@@ -68,6 +68,8 @@ class Lysn(App):
         Binding("z", "shuffle_album", "Shuffle Album"),
         Binding("n", "next_song", "Next Song"),
         Binding("b", "prev_song", "Previous Song"),
+        Binding("down", "focus_tab_content", "Enter Tab"),
+        Binding("up", "focus_tabs", "Back to Tabs"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -187,6 +189,21 @@ class Lysn(App):
         random.shuffle(songs)
         self.play_song_list(songs)
 
+    def action_focus_tab_content(self):
+        if self.get_active_tab() == "albums_tab":
+            self.album_list.focus()
+        elif self.get_active_tab() == "browse_tab":
+            self.browser_list.focus()
+
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        if event.list_view is self.album_list:
+            self.open_album_item()
+        elif event.list_view is self.browser_list:
+            self.open_browser_item()
+
+    def action_focus_tabs(self):
+        self.query_one("#tabs").focus()
+        
     #Browse
     def refresh_browser(self):
         self.browser_list.clear()
