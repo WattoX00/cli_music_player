@@ -49,7 +49,14 @@ class Lysn(App):
         padding: 1 2;
     }
 
-    #player_bar {
+    .tab-box, .list-view {
+        background: #0b0f14;  /* dark background */
+        color: #d0d7de;
+    }
+    .list-view {
+    height: 1fr;   /* fill container */
+}
+#player_bar {
         height: 4;
         border-top: solid #30363d;
         padding: 0 1;
@@ -88,11 +95,11 @@ class Lysn(App):
         with Container(id="main"):
             with TabbedContent(id="tabs"):
                 with TabPane("Albums", id="albums_tab"):
-                    self.album_list = ListView()
+                    self.album_list = ListView(classes="tab-box")
                     yield self.album_list
 
                 with TabPane("Browse", id="browse_tab"):
-                    self.browser_list = ListView()
+                    self.browser_list = ListView(classes="tab-box")
                     yield self.browser_list
 
                 with TabPane("Help"):
