@@ -15,7 +15,7 @@ from textual.widgets import (
     Label,
 )
 
-from browse.soundcloud import run_likes, run_playlist
+from .browse.soundcloud import run_likes, run_playlist
 
 MUSIC_DIR = Path.home() / "Music"
 
