@@ -51,7 +51,7 @@ class Lysn(App):
         background: #0b0f14;
         color: #d0d7de;
     }
-    
+ 
     .list-view {
         height: 1fr;
     }
