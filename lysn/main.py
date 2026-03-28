@@ -453,6 +453,9 @@ https://github.com/wattox00/lysn
 
         self.player_text.update(f"> {self.input_buffer}")
 
-if __name__ == "__main__":
+def main():
     app = Lysn()
     app.run()
+
+if __name__ == "__main__":
+    main()
