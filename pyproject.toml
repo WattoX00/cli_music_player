@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lysn"
+version = "0.1.0"
+description = "TUI music player"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+authors = [
+  { name = "Wattox00" }
+]
+
+dependencies = [
+  "textual>=0.50.0",
+  "python-vlc",
+  "yt-dlp",
+]
+
+[project.scripts]
+lysn = "lysn.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
