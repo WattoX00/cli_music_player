@@ -6,7 +6,6 @@ from textual.binding import Binding
 from textual.app import App, ComposeResult
 from textual.containers import Container, VerticalScroll
 from textual.widgets import (
-    Header,
     Static,
     TabbedContent,
     TabPane,
@@ -26,7 +25,7 @@ def song_playing(song):
 
 class Lysn(App):
     """Lysn"""
-
+    ENABLE_COMMAND_PALETTE = False
     CSS = """
     Screen {
         layout: vertical;
@@ -90,8 +89,6 @@ class Lysn(App):
     ]
 
     def compose(self) -> ComposeResult:
-        yield Header()
-
         with Container(id="main"):
             with TabbedContent(id="tabs"):
                 with TabPane("Albums", id="albums_tab"):
