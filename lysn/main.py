@@ -14,10 +14,7 @@ from textual.widgets import (
     Label,
 )
 
-from lysn.browse.soundcloud import run_likes, run_playlist
-
 MUSIC_DIR = Path.home() / "Music"
-
 
 def song_playing(song):
     return vlc.MediaPlayer(str(song))
@@ -153,7 +150,7 @@ https://github.com/wattox00/lysn
         self.browser_mode = "root"
         self.refresh_list()
         self.refresh_browser()
-        self.set_interval(0.3, self.player_tick)
+        self.set_interval(0.5, self.player_tick)
         self.muted = False
         self.sc_user = "your_username"
         self.sc_set = "your_playlist"
@@ -436,6 +433,8 @@ https://github.com/wattox00/lysn
     def on_key(self, event):
         if not self.input_mode:
             return
+
+        from lysn.browse.soundcloud import run_likes, run_playlist
 
         if event.key == "enter":
             if self.input_mode == "username":
