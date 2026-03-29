@@ -153,8 +153,7 @@ https://github.com/wattox00/lysn
         self.browser_mode = "root"
         self.refresh_list()
         self.refresh_browser()
-        self.set_interval(1, self.check_song_end)
-        self.set_interval(1, self.update_player_bar)
+        self.set_interval(0.3, self.player_tick)
         self.muted = False
         self.sc_user = "your_username"
         self.sc_set = "your_playlist"
@@ -166,13 +165,58 @@ https://github.com/wattox00/lysn
         tabs = self.query_one("#tabs", TabbedContent)
         return tabs.active
 
-    #Player
-    def check_song_end(self):
-        if hasattr(self, "player") and hasattr(self, "playlist"):
+    def player_tick(self):
+        if not hasattr(self, "player"):
+            return
+
+        if hasattr(self, "playlist"):
             state = self.player.get_state()
             if state == vlc.State.Ended:
                 self.action_next_song()
+                return
 
+        state = self.player.get_state()
+
+        icon = {
+            vlc.State.Playing: "›",
+            vlc.State.Paused: "‖",
+        }.get(state, "·")
+
+        current = self.player.get_time()
+        total = self.player.get_length()
+
+        if current <= 0 or total <= 0:
+            return
+
+        current //= 1000
+        total //= 1000
+
+        progress = current / total
+        bar_len = 30
+        filled = int(progress * bar_len)
+
+        bar = "─" * filled + " " * (bar_len - filled)
+
+        def fmt(t):
+            return f"{t//60:02}:{t%60:02}"
+
+        time_str = f"{fmt(current)} / {fmt(total)}"
+
+        vol = getattr(self, "volume", 0)
+        muted = getattr(self, "muted", False)
+        vol_str = "MUTE" if muted else f"VOL {vol:02}"
+
+        song = getattr(self, "_current_song_name", "No song")
+
+        line1 = f"{icon} {song[:40]}"
+        line2 = f"[{bar}] {time_str}   {vol_str}"
+
+        new_text = f"{line1}\n{line2}"
+
+        if getattr(self, "_last_player_bar", None) != new_text:
+            self._last_player_bar = new_text
+            self.player_text.update(new_text)
+    #Player
     def play_song_list(self, songs):
         if not songs:
             return
@@ -205,11 +249,19 @@ https://github.com/wattox00/lysn
 
         self._current_song_name = song.name
         self.player_text.update(f"Playing: {self._current_song_name}")
-        
+
     # Album Nav
     def refresh_list(self):
+        items = sorted(
+            self.current_path.iterdir(),
+            key=lambda x: (x.is_file(), x.name.lower())
+        )
+
+        if getattr(self, "_last_album_items", None) == items:
+            return
+
+        self._last_album_items = items
         self.album_list.clear()
-        items = sorted(self.current_path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
 
         for item in items:
             label = f"[DIR] {item.name}" if item.is_dir() else item.name
@@ -322,45 +374,6 @@ https://github.com/wattox00/lysn
             self.open_browser_item()
 
     # Player bar
-    def update_player_bar(self):
-        if not hasattr(self, "player"):
-            return
-
-        state = self.player.get_state()
-
-        icon = {
-            vlc.State.Playing: "›",
-            vlc.State.Paused: "‖",
-        }.get(state, "·")
-
-        current = max(0, self.player.get_time() // 1000)
-        total = max(1, self.player.get_length() // 1000)
-
-        progress = current / total
-        bar_len = 30
-        filled = int(progress * bar_len)
-
-        bar = "─" * filled + " " * (bar_len - filled)
-
-        def fmt(t):
-            return f"{t//60:02}:{t%60:02}"
-
-        time_str = f"{fmt(current)} / {fmt(total)}"
-
-        vol = getattr(self, "volume", 0)
-        muted = getattr(self, "muted", False)
-        vol_str = "MUTE" if muted else f"VOL {vol:02}"
-
-        song = "No song"
-        if hasattr(self, "playlist"):
-            song = self.playlist[self.current_index].name
-
-        line1 = f"{icon} {song[:40]}"
-
-        line2 = f"[{bar}] {time_str}   {vol_str}"
-
-        self.player_text.update(f"{line1}\n{line2}")
-
     def action_playsong(self) -> None:
         self.play_current_song()
 
