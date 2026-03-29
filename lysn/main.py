@@ -169,11 +169,15 @@ https://github.com/wattox00/lysn
     #Player
     def check_song_end(self):
         if hasattr(self, "player") and hasattr(self, "playlist"):
-            if self.player.get_state() == vlc.State.Ended:
+            state = self.player.get_state()
+            if state == vlc.State.Ended:
                 self.action_next_song()
 
     def play_song_list(self, songs):
         if not songs:
+            return
+
+        if getattr(self, "playlist", None) == songs:
             return
 
         self.playlist = songs
@@ -186,15 +190,22 @@ https://github.com/wattox00/lysn
 
         song = self.playlist[self.current_index]
 
-        if hasattr(self, "player"):
+        if not hasattr(self, "player"):
+            self.player = vlc.MediaPlayer()
+
+        else:
             self.player.stop()
 
-        self.player = song_playing(song)
+        media = vlc.Media(str(song))
+        self.player.set_media(media)
+
         self.volume = getattr(self, "volume", 50)
         self.player.audio_set_volume(self.volume)
         self.player.play()
-        self.player_text.update(f"Playing: {song.name}")
 
+        self._current_song_name = song.name
+        self.player_text.update(f"Playing: {self._current_song_name}")
+        
     # Album Nav
     def refresh_list(self):
         self.album_list.clear()
