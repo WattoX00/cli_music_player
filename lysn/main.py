@@ -441,7 +441,11 @@ https://github.com/wattox00/lysn
 
         if event.key == "enter":
             if self.input_mode == "username":
-                self.temp_username = self.input_buffer
+                if not self.input_buffer.strip():
+                    self.player_text.update("Please enter a username:")
+                    return
+
+                self.temp_username = self.input_buffer.strip()
                 self.input_buffer = ""
 
                 if self.pending_action == "likes":
@@ -452,11 +456,12 @@ https://github.com/wattox00/lysn
 
                 else:
                     self.input_mode = "setname"
-                    self.player_text.update("Enter name:")
+                    self.player_text.update("Please enter an album/playlist name:")
 
             elif self.input_mode == "setname":
-                setname = self.input_buffer
-                self.input_buffer = ""
+                if not self.input_buffer.strip():
+                    self.player_text.update("Please enter an album/playlist name:")
+                    return
 
                 self.player_text.update("Downloading...")
                 run_playlist(
