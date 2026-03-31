@@ -357,7 +357,7 @@ https://github.com/wattox00/lysn
                 self.input_mode = "username"
                 self.pending_action = "album"
 
-            elif label == "Playlists":
+            elif label == "Song":
                 self.input_mode = "username"
                 self.pending_action = "song"
 
@@ -372,9 +372,11 @@ https://github.com/wattox00/lysn
         if not self.input_mode:
             return
 
-        from lysn.browse.soundcloud import run_likes, run_playlist
+        from lysn.browse.soundcloud import run_likes, run_playlist, run_songs
 
         if event.key == "enter":
+
+            # --- USERNAME STEP ---
             if self.input_mode == "username":
                 if not self.input_buffer.strip():
                     self.player_text.update("Please enter a username:")
@@ -387,23 +389,32 @@ https://github.com/wattox00/lysn
                     self.player_text.update("Downloading likes...")
                     run_likes(self.temp_username)
                     self.player_text.update(f"Done: {self.temp_username}")
+
                     self.input_mode = None
+                    self.pending_action = None
 
                 else:
+                    # album or song → need second input
                     self.input_mode = "setname"
-                    self.player_text.update("Please enter an album/playlist name:")
+                    self.player_text.update("Enter name:")
 
+            # --- SET NAME STEP ---
             elif self.input_mode == "setname":
                 if not self.input_buffer.strip():
-                    self.player_text.update("Please enter an album/playlist name:")
+                    self.player_text.update("Please enter a name:")
                     return
 
+                setname = self.input_buffer.strip()
+                self.input_buffer = ""
+
                 self.player_text.update("Downloading...")
-                run_playlist(
-                    self.temp_username,
-                    setname,
-                    self.pending_action == "playlist"
-                )
+
+                if self.pending_action == "album":
+                    run_playlist(self.temp_username, setname)
+
+                elif self.pending_action == "song":
+                    run_songs(self.temp_username, setname)
+
                 self.player_text.update(f"Done: {setname}")
 
                 self.input_mode = None
