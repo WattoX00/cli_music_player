@@ -327,7 +327,7 @@ https://github.com/wattox00/lysn
         if self.browser_mode == "root":
             options = ["SoundCloud", "Spotify"]
         elif self.browser_mode == "soundcloud_menu":
-            options = ["Likes", "Albums", "Playlists"]
+            options = ["Likes", "Albums", "Song"]
         else:
             options = []
 
@@ -359,13 +359,64 @@ https://github.com/wattox00/lysn
 
             elif label == "Playlists":
                 self.input_mode = "username"
-                self.pending_action = "playlist"
+                self.pending_action = "song"
 
     def action_open_item(self) -> None:
         if self.get_active_tab() == "albums_tab":
             self.open_album_item()
         elif self.get_active_tab() == "browse_tab":
             self.open_browser_item()
+
+    # prompt typing
+    def on_key(self, event):
+        if not self.input_mode:
+            return
+
+        from lysn.browse.soundcloud import run_likes, run_playlist
+
+        if event.key == "enter":
+            if self.input_mode == "username":
+                if not self.input_buffer.strip():
+                    self.player_text.update("Please enter a username:")
+                    return
+
+                self.temp_username = self.input_buffer.strip()
+                self.input_buffer = ""
+
+                if self.pending_action == "likes":
+                    self.player_text.update("Downloading likes...")
+                    run_likes(self.temp_username)
+                    self.player_text.update(f"Done: {self.temp_username}")
+                    self.input_mode = None
+
+                else:
+                    self.input_mode = "setname"
+                    self.player_text.update("Please enter an album/playlist name:")
+
+            elif self.input_mode == "setname":
+                if not self.input_buffer.strip():
+                    self.player_text.update("Please enter an album/playlist name:")
+                    return
+
+                self.player_text.update("Downloading...")
+                run_playlist(
+                    self.temp_username,
+                    setname,
+                    self.pending_action == "playlist"
+                )
+                self.player_text.update(f"Done: {setname}")
+
+                self.input_mode = None
+                self.pending_action = None
+                self.temp_username = None
+
+        elif event.key == "backspace":
+            self.input_buffer = self.input_buffer[:-1]
+
+        elif event.character:
+            self.input_buffer += event.character
+
+        self.player_text.update(f"> {self.input_buffer}")
 
     # Player bar
     def action_playsong(self) -> None:
@@ -425,57 +476,6 @@ https://github.com/wattox00/lysn
             self.current_index = len(self.playlist) - 1
 
         self.play_current_song()
-
-    # prompt typing
-    def on_key(self, event):
-        if not self.input_mode:
-            return
-
-        from lysn.browse.soundcloud import run_likes, run_playlist
-
-        if event.key == "enter":
-            if self.input_mode == "username":
-                if not self.input_buffer.strip():
-                    self.player_text.update("Please enter a username:")
-                    return
-
-                self.temp_username = self.input_buffer.strip()
-                self.input_buffer = ""
-
-                if self.pending_action == "likes":
-                    self.player_text.update("Downloading likes...")
-                    run_likes(self.temp_username)
-                    self.player_text.update(f"Done: {self.temp_username}")
-                    self.input_mode = None
-
-                else:
-                    self.input_mode = "setname"
-                    self.player_text.update("Please enter an album/playlist name:")
-
-            elif self.input_mode == "setname":
-                if not self.input_buffer.strip():
-                    self.player_text.update("Please enter an album/playlist name:")
-                    return
-
-                self.player_text.update("Downloading...")
-                run_playlist(
-                    self.temp_username,
-                    setname,
-                    self.pending_action == "playlist"
-                )
-                self.player_text.update(f"Done: {setname}")
-
-                self.input_mode = None
-                self.pending_action = None
-                self.temp_username = None
-
-        elif event.key == "backspace":
-            self.input_buffer = self.input_buffer[:-1]
-
-        elif event.character:
-            self.input_buffer += event.character
-
-        self.player_text.update(f"> {self.input_buffer}")
 
 def main():
     app = Lysn()
