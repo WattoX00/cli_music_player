@@ -352,20 +352,14 @@ https://github.com/wattox00/lysn
             if label == "Likes":
                 self.input_mode = "username"
                 self.pending_action = "likes"
-                self.input_buffer = ""
-                self.player_text.update("Enter username:")
 
             elif label == "Albums":
                 self.input_mode = "username"
                 self.pending_action = "album"
-                self.input_buffer = ""
-                self.player_text.update("Enter username:")
 
             elif label == "Playlists":
                 self.input_mode = "username"
                 self.pending_action = "playlist"
-                self.input_buffer = ""
-                self.player_text.update("Enter username:")
 
     def action_open_item(self) -> None:
         if self.get_active_tab() == "albums_tab":
