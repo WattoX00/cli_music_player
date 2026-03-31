@@ -467,6 +467,8 @@ https://github.com/wattox00/lysn
                 self.player_text.update(f"Done: {setname}")
 
                 self.input_mode = None
+                self.pending_action = None
+                self.temp_username = None
 
         elif event.key == "backspace":
             self.input_buffer = self.input_buffer[:-1]
