@@ -58,7 +58,7 @@ def extract_song(username: str, song_name: str):
     return [song_url(username, song_name)]
 
 def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
-    return extract_entries(playlist_url(username, song_name, is_user_playlist))
+    return extract_entries(playlist_url(username, set_name, is_user_playlist))
 
 def get_folder_name(username: str, is_likes: bool, set_name: str = None):
     if is_likes:
