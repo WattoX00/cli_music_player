@@ -48,11 +48,17 @@ def likes_url(username: str) -> str:
 def playlist_url(username: str, set_name: str, is_user_playlist: bool = False) -> str:
     return f"https://soundcloud.com/{username}/sets/{set_name}"
 
+def song_url(username: str, song_name: str, is_user_playlist: bool = False) -> str:
+    return f"https://soundcloud.com/{username}/{song_name}"
+
 def extract_likes(username: str):
     return extract_entries(likes_url(username))
 
 def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     return extract_entries(playlist_url(username, set_name, is_user_playlist))
+
+def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
+    return extract_entries(playlist_url(username, song_name, is_user_playlist))
 
 def get_folder_name(username: str, is_likes: bool, set_name: str = None):
     if is_likes:
@@ -110,6 +116,12 @@ def run_likes(username: str):
     logger.info(f"Fetching likes for: {username}")
     urls = extract_likes(username)
     folder = get_folder_name(username, is_likes=True)
+    download_urls(urls, folder)
+
+def run_songs(username: str, song_name: str, is_user_playlist: bool = False):
+    logger.info(f"Fetching playlist: {username} / {song_name}")
+    urls = extract_playlist(username, song_name, is_user_playlist)
+    folder = get_folder_name(username, is_likes=False, set_name=None)
     download_urls(urls, folder)
 
 def run_playlist(username: str, set_name: str, is_user_playlist: bool = False):
