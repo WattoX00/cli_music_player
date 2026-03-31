@@ -158,6 +158,12 @@ https://github.com/wattox00/lysn
         self.input_buffer = ""
         self.pending_action = None
 
+    def action_quit(self):
+        if self.input_mode:
+            # Ignore quit while typing
+            return
+        self.exit()
+
     def get_active_tab(self):
         tabs = self.query_one("#tabs", TabbedContent)
         return tabs.active
