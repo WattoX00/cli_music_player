@@ -54,8 +54,8 @@ def song_url(username: str, song_name: str, is_user_playlist: bool = False) -> s
 def extract_likes(username: str):
     return extract_entries(likes_url(username))
 
-def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
-    return extract_entries(playlist_url(username, set_name, is_user_playlist))
+def extract_song(username: str, song_name: str):
+    return [song_url(username, song_name)]
 
 def extract_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     return extract_entries(playlist_url(username, song_name, is_user_playlist))
@@ -63,10 +63,12 @@ def extract_playlist(username: str, set_name: str, is_user_playlist: bool = Fals
 def get_folder_name(username: str, is_likes: bool, set_name: str = None):
     if is_likes:
         return f"{username}-likes"
-    return set_name
+    if set_name:
+        return set_name
+    return ""
 
 def download_urls(urls, folder_name: str):
-    target_dir = BASE_DIR / folder_name
+    target_dir = BASE_DIR if not folder_name else BASE_DIR / folder_name
     target_dir.mkdir(parents=True, exist_ok=True)
 
     downloaded_file = target_dir / "downloaded.txt"
@@ -118,10 +120,10 @@ def run_likes(username: str):
     folder = get_folder_name(username, is_likes=True)
     download_urls(urls, folder)
 
-def run_songs(username: str, song_name: str, is_user_playlist: bool = False):
-    logger.info(f"Fetching playlist: {username} / {song_name}")
-    urls = extract_playlist(username, song_name, is_user_playlist)
-    folder = get_folder_name(username, is_likes=False, set_name=None)
+def run_songs(username: str, song_name: str):
+    logger.info(f"Fetching song: {username} / {song_name}")
+    urls = extract_song(username, song_name)
+    folder = get_folder_name(username, is_likes=False, set_name=song_name)
     download_urls(urls, folder)
 
 def run_playlist(username: str, set_name: str, is_user_playlist: bool = False):
