@@ -62,7 +62,7 @@ class Lysn(App):
     """
 
     BINDINGS = [
-        Binding("q", "quit", "Quit"),
+        Binding("ctrl+q", "quit", "Quit"),
         Binding("enter", "open_item", "Open"),
         Binding("backspace", "go_back", "Back"),
         # Playback controls
