@@ -107,7 +107,8 @@ class Lysn(App):
                     with VerticalScroll():
                         yield Static(
             f"""
-{LysnVersion.version()}
+Lysn - {LysnVersion.version()}
+
 NAVIGATION
 ----------
 [↑ / ↓]        Move selection
@@ -494,7 +495,7 @@ https://github.com/wattox00/lysn
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="lysn",
-        description=f"{LysnVersion.version()}\n :)",
+        description=f"{LysnVersion.version()}\nTUI Music Player :)",
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument("-hf", "--helpf", action="store_true", help="show full help message and exit")

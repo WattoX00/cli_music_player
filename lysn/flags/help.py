@@ -3,7 +3,8 @@ from .version import LysnVersion
 class LysnHelp():
     def helpFull():
         print(f"""
-{LysnVersion.version()}
+Lysn - {LysnVersion.version()}
+
 NAVIGATION
 ----------
 [↑ / ↓]        Move selection
