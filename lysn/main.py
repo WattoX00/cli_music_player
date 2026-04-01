@@ -7,6 +7,7 @@ from textual.app import App, ComposeResult
 from textual.containers import Container, VerticalScroll
 from textual.widgets import (
     Static,
+    Input,
     TabbedContent,
     TabPane,
     ListView,
@@ -45,6 +46,13 @@ class Lysn(App):
 
     TabbedContent {
         height: 1fr;
+    }
+
+    #prompt {
+        dock: bottom;
+        border-top: solid #30363d;
+        background: #0b0f14;
+        color: #ffffff;
     }
 
     .tab-box {
@@ -134,7 +142,11 @@ class Lysn(App):
 
                 with TabPane("Browse", id="browse_tab"):
                     self.browser_list = ListView(classes="tab-box")
+                    self.prompt = Input(placeholder="", id="prompt")
+                    self.prompt.display = False
+                    yield self.prompt
                     yield self.browser_list
+
 
                 with TabPane("Help"):
                     with VerticalScroll():
@@ -158,8 +170,9 @@ class Lysn(App):
         self.sc_user = "your_username"
         self.sc_set = "your_playlist"
         self.input_mode = None
-        self.input_buffer = ""
         self.pending_action = None
+        self.temp_username = None
+        self.input_buffer = ""
 
     def action_quit(self):
         self.exit()
@@ -354,16 +367,16 @@ class Lysn(App):
 
         elif self.browser_mode == "soundcloud_menu":
             if label == "Likes":
-                self.input_mode = "username"
                 self.pending_action = "likes"
+                self.show_prompt("Enter SoundCloud username...", "username")
 
             elif label == "Albums":
-                self.input_mode = "username"
                 self.pending_action = "album"
+                self.show_prompt("Enter SoundCloud username...", "username")
 
             elif label == "Song":
-                self.input_mode = "username"
                 self.pending_action = "song"
+                self.show_prompt("Enter SoundCloud username...", "username")
 
     def action_open_item(self) -> None:
         if self.get_active_tab() == "albums_tab":
@@ -372,63 +385,62 @@ class Lysn(App):
             self.open_browser_item()
 
     # prompt typing
-    def on_key(self, event):
-        if not self.input_mode:
-            return
+    def on_input_submitted(self, event: Input.Submitted):
+        value = event.value.strip()
 
         from lysn.browse.soundcloud import run_likes, run_playlist, run_songs
 
-        if event.key == "enter":
+        if self.input_mode == "username":
+            if not value:
+                self.player_text.update("Username required.")
+                return
 
-            if self.input_mode == "username":
-                if not self.input_buffer.strip():
-                    self.player_text.update("Please enter a username:")
-                    return
+            self.temp_username = value
 
-                self.temp_username = self.input_buffer.strip()
-                self.input_buffer = ""
+            if self.pending_action == "likes":
+                self.player_text.update("Downloading likes...")
+                run_likes(value)
+                self.player_text.update(f"Done: {value}")
+                self.hide_prompt()
 
-                if self.pending_action == "likes":
-                    self.player_text.update("Downloading likes...")
-                    run_likes(self.temp_username)
-                    self.player_text.update(f"Done: {self.temp_username}")
+            else:
+                self.show_prompt("Enter name (playlist/song)...", "setname")
 
-                    self.input_mode = None
-                    self.pending_action = None
+        elif self.input_mode == "setname":
+            if not value:
+                self.player_text.update("Name required.")
+                return
 
-                else:
-                    self.input_mode = "setname"
-                    self.player_text.update("Enter name:")
+            self.player_text.update("Downloading...")
 
-            elif self.input_mode == "setname":
-                if not self.input_buffer.strip():
-                    self.player_text.update("Please enter a name:")
-                    return
+            if self.pending_action == "album":
+                run_playlist(self.temp_username, value)
 
-                setname = self.input_buffer.strip()
-                self.input_buffer = ""
+            elif self.pending_action == "song":
+                run_songs(self.temp_username, value)
 
-                self.player_text.update("Downloading...")
+            self.player_text.update(f"Done: {value}")
+            self.hide_prompt()
 
-                if self.pending_action == "album":
-                    run_playlist(self.temp_username, setname)
+    def show_prompt(self, placeholder: str, mode: str):
+        self.input_mode = mode
+        self.prompt.placeholder = placeholder
+        self.prompt.value = ""
+        self.prompt.display = True
+        self.prompt.focus()
 
-                elif self.pending_action == "song":
-                    run_songs(self.temp_username, setname)
+    def hide_prompt(self):
+        self.prompt.display = False
+        self.input_mode = None
+        self.pending_action = None
 
-                self.player_text.update(f"Done: {setname}")
+    def on_key(self, event):
+        if self.input_mode:
+            if event.key == "escape":
+                self.hide_prompt()
+                return
 
-                self.input_mode = None
-                self.pending_action = None
-                self.temp_username = None
-
-        elif event.key == "backspace":
-            self.input_buffer = self.input_buffer[:-1]
-
-        elif event.character:
-            self.input_buffer += event.character
-
-        self.player_text.update(f"> {self.input_buffer}")
+            return
 
     # Player bar
     def action_playsong(self) -> None:
