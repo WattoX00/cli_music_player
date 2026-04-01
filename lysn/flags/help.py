@@ -9,6 +9,7 @@ NAVIGATION
 [↑ / ↓]        Move selection
 [Enter]        Open item / Confirm
 [Backspace]    Go back
+[CTRL+Q]       Exit application
 
 PLAYBACK CONTROLS
 -----------------
@@ -34,9 +35,6 @@ ALBUM ACTIONS
 [P]            Play album
 [Z]            Shuffle album
 
-QUIT
-----
-[Q]            Exit application
 
 FOR MORE CHECK OUT THE FULL DOCUMENTATION ON:
 https://github.com/wattox00/lysn

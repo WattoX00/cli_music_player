@@ -14,13 +14,18 @@ from textual.widgets import (
     Label,
 )
 
+# for flags
+
+import argparse
+from .flags.update import LysnUpdate
+from .flags.version import LysnVersion
+from .flags.help import LysnHelp
 
 
 MUSIC_DIR = Path.home() / "Music"
 
 def song_playing(song):
     return vlc.MediaPlayer(str(song))
-
 
 class Lysn(App):
     """Lysn"""
@@ -101,12 +106,14 @@ class Lysn(App):
                 with TabPane("Help"):
                     with VerticalScroll():
                         yield Static(
-            """
+            f"""
+{LysnVersion.version()}
 NAVIGATION
 ----------
 [↑ / ↓]        Move selection
 [Enter]        Open item / Confirm
 [Backspace]    Go back
+[CTRL+Q]       Exit application
 
 PLAYBACK CONTROLS
 -----------------
@@ -132,9 +139,6 @@ ALBUM ACTIONS
 [P]            Play album
 [Z]            Shuffle album
 
-QUIT
-----
-[Q]            Exit application
 
 FOR MORE CHECK OUT THE FULL DOCUMENTATION ON:
 https://github.com/wattox00/lysn
@@ -486,14 +490,6 @@ https://github.com/wattox00/lysn
             self.current_index = len(self.playlist) - 1
 
         self.play_current_song()
-
-
-# for flags
-
-import argparse
-from .flags.update import LysnUpdate
-from .flags.version import LysnVersion
-from .flags.help import LysnHelp
 
 def parse_args():
     parser = argparse.ArgumentParser(
