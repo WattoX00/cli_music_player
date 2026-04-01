@@ -14,6 +14,26 @@ from textual.widgets import (
     Label,
 )
 
+# for flags
+import argparse
+from .flags.update import LysnUpdate
+from .flags.version import LysnVersion
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog="lysn",
+        description=f"{UsysVersion.version()}\n :)",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument("-hf", "--helpf", action="store_true", help="show full help message and exit")
+
+    info = parser.add_argument_group("Information")
+    info.add_argument("-u", "--update", action="store_true", help="update lysn with pipx")
+    info.add_argument("-v", "--version", action="store_true", help="show version and exit")
+
+    return parser.parse_args()
+
+
 MUSIC_DIR = Path.home() / "Music"
 
 def song_playing(song):
@@ -486,6 +506,19 @@ https://github.com/wattox00/lysn
         self.play_current_song()
 
 def main():
+    args = parse_args()
+ 
+    if args.helpf:
+        LysnHelp.helpFull()
+        return
+
+    if args.update:
+        LysnUpdate.update()
+        return
+
+    if args.version:
+        print(LysnVersion.version())
+        return
     app = Lysn()
     app.run()
 
