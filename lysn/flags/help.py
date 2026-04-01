@@ -1,7 +1,7 @@
 from .version import LysnVersion
 
 class LysnHelp():
-    def helpfull():
+    def helpFull():
         print(f"""
 {LysnVersion.version()}
 NAVIGATION
