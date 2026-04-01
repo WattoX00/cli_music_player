@@ -181,9 +181,9 @@ class Lysn(App):
         state = self.player.get_state()
 
         icon = {
-            vlc.State.Playing: "›",
-            vlc.State.Paused: "‖",
-        }.get(state, "·")
+            vlc.State.Playing: "▶",
+            vlc.State.Paused: "▮▮",
+        }.get(state, "•")
 
         current = self.player.get_time()
         total = self.player.get_length()
@@ -198,7 +198,7 @@ class Lysn(App):
         bar_len = 30
         filled = int(progress * bar_len)
 
-        bar = "─" * filled + " " * (bar_len - filled)
+        bar = "━" * filled + "·" * (bar_len - filled)
 
         def fmt(t):
             return f"{t//60:02}:{t%60:02}"
@@ -207,18 +207,19 @@ class Lysn(App):
 
         vol = getattr(self, "volume", 0)
         muted = getattr(self, "muted", False)
-        vol_str = "MUTE" if muted else f"VOL {vol:02}"
+        vol_str = "M" if muted else f"{vol}%"
 
         song = getattr(self, "_current_song_name", "No song")
 
-        line1 = f"{icon} {song[:40]}"
-        line2 = f"[{bar}] {time_str}   {vol_str}"
+        line1 = f"{icon}  {song[:40]}"
+        line2 = f"{fmt(current)} {bar} {fmt(total)}  {vol_str}"
 
         new_text = f"{line1}\n{line2}"
 
         if getattr(self, "_last_player_bar", None) != new_text:
             self._last_player_bar = new_text
             self.player_text.update(new_text)
+
     # Player
     def play_song_list(self, songs):
         if not songs:
@@ -250,7 +251,7 @@ class Lysn(App):
         self.player.audio_set_volume(self.volume)
         self.player.play()
 
-        self._current_song_name = song.name
+        self._current_song_name = song.stem
         self.player_text.update(f"Playing: {self._current_song_name}")
 
     # Album Nav
