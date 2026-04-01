@@ -498,7 +498,7 @@ from .flags.help import LysnHelp
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="lysn",
-        description=f"{UsysVersion.version()}\n :)",
+        description=f"{LysnVersion.version()}\n :)",
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument("-hf", "--helpf", action="store_true", help="show full help message and exit")
