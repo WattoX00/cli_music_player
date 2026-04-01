@@ -110,39 +110,29 @@ class Lysn(App):
 Lysn - {LysnVersion.version()}
 
 NAVIGATION
-----------
-[↑ / ↓]        Move selection
-[Enter]        Open item / Confirm
-[Backspace]    Go back
-[CTRL+Q]       Exit application
+  ↑ / ↓        Move selection
+  Enter        Open / confirm
+  Backspace    Go back
+  Ctrl+Q       Exit
 
-PLAYBACK CONTROLS
------------------
-[Space]        Pause / Resume
-[S]            Stop
-[R]            Restart song
-[N]            Next song
-[B]            Previous song
+PLAYBACK
+  Space        Pause / resume
+  S            Stop
+  R            Restart
+  N / B        Next / previous
 
-SEEKING
--------
-[D]            Forward 10 seconds
-[A]            Backward 10 seconds
+SEEK
+  D / A        +10s / -10s
 
 VOLUME
-------
-[W]            Volume up
-[X]            Volume down
-[M]            Mute toggle
+  W / X        Up / down
+  M            Mute
 
-ALBUM ACTIONS
--------------
-[P]            Play album
-[Z]            Shuffle album
+ALBUM
+  P            Play album
+  Z            Shuffle
 
-
-FOR MORE CHECK OUT THE FULL DOCUMENTATION ON:
-https://github.com/wattox00/lysn
+Docs: https://github.com/wattox00/lysn
             """,
                             classes="tab-box",
                             markup=False,
