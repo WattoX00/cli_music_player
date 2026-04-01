@@ -29,7 +29,9 @@ def song_playing(song):
 
 class Lysn(App):
     """Lysn"""
+
     ENABLE_COMMAND_PALETTE = False
+
     CSS = """
     Screen {
         layout: vertical;
@@ -48,15 +50,12 @@ class Lysn(App):
     .tab-box {
         border: round #30363d;
         padding: 1 2;
+        background: #0b0f14;
     }
 
-    .tab-box, .list-view {
-        background: #0b0f14;
-        color: #d0d7de;
-    }
- 
     .list-view {
         height: 1fr;
+        background: #0b0f14;
     }
 
     #player_bar {
@@ -72,29 +71,63 @@ class Lysn(App):
         Binding("ctrl+q", "quit", "Quit"),
         Binding("enter", "open_item", "Open"),
         Binding("backspace", "go_back", "Back"),
-        # Playback controls
-        Binding("space", "pausesong", "Pause Song"),
-        Binding("s", "stopsong", "Stop Song"),
-        Binding("r", "restartsong", "Restart Song"),
-        Binding("n", "next_song", "Next Song"),
-        Binding("b", "prev_song", "Previous Song"),
-        # Seeking
-        Binding("d", "forwardsong", "Seek 10 sec"),
-        Binding("a", "backwardsong", "Go back 10 sec"),
+        # Playback
+        Binding("space", "pausesong", "Pause / Resume"),
+        Binding("s", "stopsong", "Stop"),
+        Binding("r", "restartsong", "Restart"),
+        Binding("n", "next_song", "Next"),
+        Binding("b", "prev_song", "Previous"),
+        # Seek
+        Binding("d", "forwardsong", "+10s"),
+        Binding("a", "backwardsong", "-10s"),
         # Volume
         Binding("w", "volumeup", "Volume Up"),
         Binding("x", "volumedown", "Volume Down"),
         Binding("m", "volumemute", "Mute"),
-        # Album action
+        # Album
         Binding("p", "play_album", "Play Album"),
         Binding("z", "shuffle_album", "Shuffle Album"),
-
+        # UI
         Binding("down", "focus_tab_content", "Enter Tab"),
     ]
+
+    def format_key(self, key: str) -> str:
+        """Make keys human-friendly."""
+        key = key.replace("ctrl+", "Ctrl+")
+        return key.capitalize() if len(key) > 1 else key.upper()
+
+    def generate_help(self) -> str:
+        """Generate dynamic help text."""
+
+        sections = {
+            "Navigation": ["quit", "open_item", "go_back", "focus_tab_content"],
+            "Playback": ["pausesong", "stopsong", "restartsong", "next_song", "prev_song"],
+            "Seek": ["forwardsong", "backwardsong"],
+            "Volume": ["volumeup", "volumedown", "volumemute"],
+            "Album": ["play_album", "shuffle_album"],
+        }
+
+        lines = [f"[bold]Lysn[/] - {LysnVersion.version()}", ""]
+
+        for section, actions in sections.items():
+            lines.append(f"[bold]{section.upper()}[/]")
+
+            for action in actions:
+                for binding in self.BINDINGS:
+                    if binding.action == action:
+                        key = self.format_key(binding.key)
+                        lines.append(f"  [cyan]{key:<10}[/] {binding.description}")
+
+            lines.append("")
+
+        lines.append("[dim]Docs: https://github.com/wattox00/lysn[/]")
+
+        return "\n".join(lines)
 
     def compose(self) -> ComposeResult:
         with Container(id="main"):
             with TabbedContent(id="tabs"):
+
                 with TabPane("Albums", id="albums_tab"):
                     self.album_list = ListView(classes="tab-box")
                     yield self.album_list
@@ -106,36 +139,9 @@ class Lysn(App):
                 with TabPane("Help"):
                     with VerticalScroll():
                         yield Static(
-            f"""
-Lysn - {LysnVersion.version()}
-
-NAVIGATION
-  ↑ / ↓        Move selection
-  Enter        Open / confirm
-  Backspace    Go back
-  Ctrl+Q       Exit
-
-PLAYBACK
-  Space        Pause / resume
-  S            Stop
-  R            Restart
-  N / B        Next / previous
-
-SEEK
-  D / A        +10s / -10s
-
-VOLUME
-  W / X        Up / down
-  M            Mute
-
-ALBUM
-  P            Play album
-  Z            Shuffle
-
-Docs: https://github.com/wattox00/lysn
-            """,
+                            self.generate_help(),
                             classes="tab-box",
-                            markup=False,
+                            markup=True,
                         )
 
         self.player_text = Static("No song playing", id="player_bar")
