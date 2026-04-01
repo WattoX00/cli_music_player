@@ -98,20 +98,18 @@ Available options:
 - Playlists / Albums
 - Single Song
 
-# ⚠️ Important Input Rules
-You may need to press Enter twice when prompted.
-
-Enter only the exact names from the URL.
+Enter only the exact names from the URL. You can paste in with CTRL+V
 
 ### Examples:
 
 #### Likes:
-
+url: `https://soundcloud.com/mjimmortal/likes`
 ```
 username: mjimmortal
 ```
 
 #### Playlist / Album:
+url: `https://soundcloud.com/mjimmortal/sets/thriller-40`
 
 ```
 username: mjimmortal
@@ -119,6 +117,7 @@ playlist/album: thriller-40
 ```
 
 #### Song download:
+url: `https://soundcloud.com/mjimmortal/billie-jean-single-version`
 
 ```
 username: mjimmortal
