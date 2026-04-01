@@ -216,7 +216,7 @@ https://github.com/wattox00/lysn
         if getattr(self, "_last_player_bar", None) != new_text:
             self._last_player_bar = new_text
             self.player_text.update(new_text)
-    #Player
+    # Player
     def play_song_list(self, songs):
         if not songs:
             return
@@ -376,7 +376,6 @@ https://github.com/wattox00/lysn
 
         if event.key == "enter":
 
-            # --- USERNAME STEP ---
             if self.input_mode == "username":
                 if not self.input_buffer.strip():
                     self.player_text.update("Please enter a username:")
@@ -394,11 +393,9 @@ https://github.com/wattox00/lysn
                     self.pending_action = None
 
                 else:
-                    # album or song → need second input
                     self.input_mode = "setname"
                     self.player_text.update("Enter name:")
 
-            # --- SET NAME STEP ---
             elif self.input_mode == "setname":
                 if not self.input_buffer.strip():
                     self.player_text.update("Please enter a name:")
