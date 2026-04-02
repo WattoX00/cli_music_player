@@ -71,12 +71,6 @@ def download_urls(urls, folder_name: str):
     target_dir = BASE_DIR if not folder_name else BASE_DIR / folder_name
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    urls = [u for u in urls if u not in seen]
-
-    if not urls:
-        logger.info("No new tracks")
-        return
-
     ydl_opts = {
         "outtmpl": str(target_dir / "%(title)s"),
         "format": "bestaudio/best",
