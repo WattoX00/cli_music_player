@@ -71,14 +71,6 @@ def download_urls(urls, folder_name: str):
     target_dir = BASE_DIR if not folder_name else BASE_DIR / folder_name
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    downloaded_file = target_dir / "downloaded.txt"
-    ignored_file = target_dir / "ignored.txt"
-    errors_file = target_dir / "errors.txt"
-
-    downloaded = load_set(downloaded_file)
-    ignored = load_set(ignored_file)
-    seen = downloaded | ignored
-
     urls = [u for u in urls if u not in seen]
 
     if not urls:
@@ -92,27 +84,14 @@ def download_urls(urls, folder_name: str):
         "noplaylist": True,
     }
 
-    success = []
-    failed = []
-
     with YoutubeDL(ydl_opts) as ydl:
         for i, url in enumerate(urls, 1):
             logger.info(f"{i}/{len(urls)} downloading")
             try:
                 ydl.download([url])
-                success.append(url)
             except Exception as e:
-                failed.append((url, str(e)))
+                pass
             time.sleep(1)
-
-    append_lines(downloaded_file, success)
-
-    if failed:
-        with errors_file.open("a") as f:
-            f.write(f"\n\nRun @ {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            for url, err in failed:
-                f.write(f"{url}\n{err}\n\n")
-
 
 def run_likes(username: str):
     logger.info(f"Fetching likes for: {username}")
@@ -131,3 +110,16 @@ def run_playlist(username: str, set_name: str, is_user_playlist: bool = False):
     urls = extract_playlist(username, set_name, is_user_playlist)
     folder = get_folder_name(username, is_likes=False, set_name=set_name)
     download_urls(urls, folder)
+
+def run_url(url: str):
+    logger.info(f"Processing URL: {url}")
+
+    urls = extract_entries(url)
+
+    if not urls:
+        urls = [url]
+
+    parts = url.rstrip("/").split("/")
+    folder_name = parts[-1] if len(parts) > 3 else ""
+
+    download_urls(urls, folder_name)

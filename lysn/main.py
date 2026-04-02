@@ -344,7 +344,7 @@ class Lysn(App):
         if self.browser_mode == "root":
             options = ["SoundCloud", "Spotify"]
         elif self.browser_mode == "soundcloud_menu":
-            options = ["Likes", "Albums", "Song"]
+            options = ["Likes", "Albums", "Song", "Url"]
         else:
             options = []
 
@@ -378,6 +378,10 @@ class Lysn(App):
                 self.pending_action = "song"
                 self.show_prompt("Enter SoundCloud username...", "username")
 
+            elif label == "Url":
+                self.pending_action = "url"
+                self.show_prompt("Enter a SoundCloud url...", "url")
+
     def action_open_item(self) -> None:
         if self.get_active_tab() == "albums_tab":
             self.open_album_item()
@@ -388,7 +392,16 @@ class Lysn(App):
     def on_input_submitted(self, event: Input.Submitted):
         value = event.value.strip()
 
-        from lysn.browse.soundcloud import run_likes, run_playlist, run_songs
+        from lysn.browse.soundcloud import run_likes, run_playlist, run_songs, run_url
+
+        if self.input_mode == "url":
+            if not value:
+                self.player_text.update("Url required.")
+                return
+
+            run_url(value)
+            self.player_text.update(f"Done: {value}")
+            self.hide_prompt()
 
         if self.input_mode == "username":
             if not value:
