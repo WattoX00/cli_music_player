@@ -301,6 +301,10 @@ class Lysn(App):
             if self.history:
                 self.current_path = self.history.pop()
                 self.refresh_list()
+        elif self.get_active_tab() == "browse_tab":
+            if self.browser_mode in ("soundcloud_menu", "youtube_menu"):
+                self.browser_mode = "root"
+                self.refresh_browser()
 
         elif self.get_active_tab() == "browse_tab":
             if self.browser_mode == "soundcloud_menu":
@@ -342,9 +346,11 @@ class Lysn(App):
         self.browser_list.clear()
 
         if self.browser_mode == "root":
-            options = ["SoundCloud", "Spotify"]
+            options = ["SoundCloud", "Spotify", "Youtube"]
         elif self.browser_mode == "soundcloud_menu":
             options = ["Likes", "Albums", "Song", "Url"]
+        elif self.browser_mode == "youtube_menu":
+            options = ["Url"]
         else:
             options = []
 
@@ -364,6 +370,15 @@ class Lysn(App):
             if label == "SoundCloud":
                 self.browser_mode = "soundcloud_menu"
                 self.refresh_browser()
+
+            elif label == "Youtube":
+                self.browser_mode = "youtube_menu"
+                self.refresh_browser()
+
+        elif self.browser_mode == "youtube_menu":
+            if label == "Url":
+                self.pending_action = "yt_url"
+                self.show_prompt("Enter a YouTube url...", "url")
 
         elif self.browser_mode == "soundcloud_menu":
             if label == "Likes":
@@ -393,10 +408,18 @@ class Lysn(App):
         value = event.value.strip()
 
         from lysn.browse.soundcloud import run_likes, run_playlist, run_songs, run_url
+        from lysn.browse.youtube import run_url as yt_run_url
 
         if self.input_mode == "url":
             if not value:
                 self.player_text.update("Url required.")
+                return
+
+            if self.pending_action == "yt_url":
+                self.player_text.update("Downloading from YouTube...")
+                yt_run_url(value)
+                self.player_text.update(f"Done: {value}")
+                self.hide_prompt()
                 return
 
             run_url(value)
