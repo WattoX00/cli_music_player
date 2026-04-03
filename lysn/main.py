@@ -281,7 +281,7 @@ class Lysn(App):
         self.album_list.clear()
 
         for item in items:
-            label = f"[DIR] {item.name}" if item.is_dir() else item.name
+            label = f"[DIR] {item.name}" if item.is_dir() else item.stem
             self.album_list.append(ListItem(Label(label)))
 
     def open_album_item(self):
