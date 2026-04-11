@@ -40,6 +40,7 @@ lysn
 ## Controls
 <details>
 <summary>See all</summary>
+
 ### Navigation
 
 | Key       | Action         |
@@ -93,6 +94,8 @@ Albums are detected as subfolders inside `~/Music`.
 Supported formats depend on your system’s audio backend.
 
 ## Interface Overview
+<details>
+<summary>See all</summary>
 
 ### 📀 Album Tab
 - Reads your `~/Music` directory.
@@ -146,6 +149,8 @@ song: billie-jean-single-version
 
 ### ❓ Help Tab
 - Displays all keybindings inside the app.
+
+</details>
 
 ## Flags
 ```bash
