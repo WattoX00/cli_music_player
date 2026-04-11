@@ -8,6 +8,15 @@
 [![License](https://img.shields.io/github/license/wattox00/lysn?style=for-the-badge)](https://github.com/WattoX00/lysn/blob/main/LICENSE)
 
 <details>
+<summary>Demos</summary>
+ 
+<img width="1853" height="999" alt="Image" src="https://github.com/user-attachments/assets/9a949799-4be2-44da-aa92-161c6466ab74" />
+<img width="1870" height="1005" alt="Image" src="https://github.com/user-attachments/assets/7e6c1c83-6e95-4944-ada1-725ae8accd0d" />
+<img width="1879" height="1013" alt="Image" src="https://github.com/user-attachments/assets/efed1aa1-25fe-432d-9dc4-ffcc0c5cf79d" />
+
+</details>
+ 
+<details>
 <summary>📚 Contents</summary>
  
 - [Installation](#installation)
