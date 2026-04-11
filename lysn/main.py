@@ -16,7 +16,6 @@ from textual.widgets import (
 )
 
 # for flags
-
 import argparse
 from .flags.update import LysnUpdate
 from .flags.version import LysnVersion
