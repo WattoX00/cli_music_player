@@ -1,31 +1,45 @@
-# Lysn — CLI Music Player
+# Lysn - CLI Music Player
 
-**Lysn** is a lightweight, terminal-based music player with built-in downloading support.  
-It’s designed for speed, simplicity, and full keyboard control.
+[![Version](https://img.shields.io/badge/version-0.2.5-blue?style=for-the-badge)](https://github.com/WattoX00/lysn/releases/tag/v0.2.5)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue?style=for-the-badge)
+[![PyPI](https://img.shields.io/pypi/v/lysn?style=for-the-badge)](https://pypi.org/project/lysn/)
+![Status](https://img.shields.io/badge/status-active-success?style=for-the-badge)
+![Build](https://img.shields.io/github/actions/workflow/status/wattox00/lysn/publish.yml?style=for-the-badge)
+[![License](https://img.shields.io/github/license/wattox00/lysn?style=for-the-badge)](https://github.com/WattoX00/lysn/blob/main/LICENSE)
 
-## ✨ Features
+<details>
+<summary>📚 Contents</summary>
+ 
+- [Installation](#installation)
+- [Usage](#usage)
+- [Controls](#controls)
+- [Music Directory](#music-directory)
+- [Interface Overview](#interface-overview)
+- [Support](#support)
+- [License](#license)
 
-- ▶️ Play local audio files from `/Music`
-- ⬇️ Download music from SoundCloud (users, playlists, albums, songs)
-- ⌨️ Fast, keyboard-driven interface
-- 📀 Album-based playback
-- 🔀 Shuffle support
-- 🚧 Upcoming: Spotify integration
+</details>
 
-## 📦 Installation
+## Installation
 
 ```bash
 pip install lysn
 ```
 
-# 🚀 Usage
+> [!IMPORTANT]
+> `todol` is a terminal application. I recommend installing it with `pipx`.
+
+# Usage
 
 Run the application:
 
 ```bash
 lysn
 ```
-## 🎮 Controls
+
+## Controls
+<details>
+<summary>See all</summary>
 ### Navigation
 
 | Key       | Action         |
@@ -71,16 +85,17 @@ lysn
 |  ---   | ---------------- |
 | Ctrl+Q | Exit application |
 
+</details>
 
-## 📁 Music Directory
-Place all your music inside the /Music directory.
-Albums are detected as subfolders inside /Music.
+## Music Directory
+Place all your music inside the `~/Music` directory on your system.
+Albums are detected as subfolders inside `~/Music`.
 Supported formats depend on your system’s audio backend.
 
-## 🧭 Interface Overview
+## Interface Overview
 
 ### 📀 Album Tab
-- Reads your /Music directory.
+- Reads your `~/Music` directory.
 - Subfolders are treated as albums.
 - Enter an album to view tracks.
 - Press:
@@ -125,14 +140,14 @@ song: billie-jean-single-version
 ```
 
 #### Download Behavior
-- Downloads go into /Music.
+- Downloads go into `~/Music`.
 - The app may appear frozen during download - this is normal.
 - In some cases, progress may not appear in the UI.
 
 ### ❓ Help Tab
 - Displays all keybindings inside the app.
 
-## ⚙️ CLI Flags
+## Flags
 ```bash
 lysn --help
 lysn --helpf
@@ -141,8 +156,26 @@ lysn --update
 ```
 
 ## 📝 Notes
-- All downloaded content is saved to /Music.
+- All downloaded content is saved to `~/Music`.
 - Make sure names match exactly with SoundCloud URLs.
-- Performance depends on your system and audio backend.
 
 Enjoy your music - right from the terminal.
+
+## Support
+
+If this project saved you time, taught you something, or made your day a little easier,
+you can support its development here:
+
+👉 **[Buy me a coffee via PayPal](https://www.paypal.com/paypalme/wattox)**
+
+Your support helps keep the project:
+- Actively maintained
+- Continuously improved
+- Free and open source
+
+Thanks for being part of the community 🤝
+
+## License
+
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for full details.
