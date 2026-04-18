@@ -36,7 +36,7 @@ pip install lysn
 ```
 
 > [!IMPORTANT]
-> `todol` is a terminal application. I recommend installing it with `pipx`.
+> `lysn` is a terminal application. I recommend installing it with `pipx`.
 
 # Usage
 
