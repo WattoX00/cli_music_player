@@ -233,15 +233,12 @@ class Lysn(App):
             self.player_text.update(new_text)
 
     # Player
-    def play_song_list(self, songs):
+    def play_song_list(self, songs, start_index=0):
         if not songs:
             return
 
-        if getattr(self, "playlist", None) == songs:
-            return
-
         self.playlist = songs
-        self.current_index = 0
+        self.current_index = start_index
         self.play_current_song()
 
     def play_current_song(self):
@@ -318,7 +315,7 @@ class Lysn(App):
             return
 
         songs = sorted(self.get_album_songs())
-        self.play_song_list(songs)
+        self.play_song_list(songs, start_index=0)
 
     def action_shuffle_album(self) -> None:
         if self.current_path == MUSIC_DIR:
@@ -326,7 +323,7 @@ class Lysn(App):
 
         songs = self.get_album_songs()
         random.shuffle(songs)
-        self.play_song_list(songs)
+        self.play_song_list(songs, start_index=0)
 
     def action_focus_tab_content(self):
         if self.get_active_tab() == "albums_tab":
@@ -398,7 +395,25 @@ class Lysn(App):
 
     def action_open_item(self) -> None:
         if self.get_active_tab() == "albums_tab":
+            if self.album_list.index is None:
+                return
+
+            items = sorted(
+                self.current_path.iterdir(),
+                key=lambda x: (x.is_file(), x.name.lower())
+            )
+            selected = items[self.album_list.index]
+
+            # ▶ NEW: play song if it's a file
+            if selected.is_file():
+                songs = sorted(self.get_album_songs())
+                start_index = songs.index(selected)
+                self.play_song_list(songs, start_index=start_index)
+                return  # IMPORTANT: stop here so it doesn't try to "open" it
+
+            # otherwise navigate into folder
             self.open_album_item()
+
         elif self.get_active_tab() == "browse_tab":
             self.open_browser_item()
 
