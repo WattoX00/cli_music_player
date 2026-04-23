@@ -342,7 +342,6 @@ class Lysn(App):
             )
             selected = items[self.album_list.index]
 
-            # ▶ PLAY if it's a song
             if selected.is_file():
                 songs = sorted(self.get_album_songs())
                 start_index = songs.index(selected)
@@ -420,14 +419,12 @@ class Lysn(App):
             )
             selected = items[self.album_list.index]
 
-            # ▶ NEW: play song if it's a file
             if selected.is_file():
                 songs = sorted(self.get_album_songs())
                 start_index = songs.index(selected)
                 self.play_song_list(songs, start_index=start_index)
-                return  # IMPORTANT: stop here so it doesn't try to "open" it
+                return
 
-            # otherwise navigate into folder
             self.open_album_item()
 
         elif self.get_active_tab() == "browse_tab":
@@ -505,7 +502,6 @@ class Lysn(App):
             if event.key == "escape":
                 self.hide_prompt()
                 return
-
             return
 
     # Player bar
