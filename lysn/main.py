@@ -333,7 +333,23 @@ class Lysn(App):
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         if event.list_view is self.album_list:
-            self.open_album_item()
+            if self.album_list.index is None:
+                return
+
+            items = sorted(
+                self.current_path.iterdir(),
+                key=lambda x: (x.is_file(), x.name.lower())
+            )
+            selected = items[self.album_list.index]
+
+            # ▶ PLAY if it's a song
+            if selected.is_file():
+                songs = sorted(self.get_album_songs())
+                start_index = songs.index(selected)
+                self.play_song_list(songs, start_index=start_index)
+            else:
+                self.open_album_item()
+
         elif event.list_view is self.browser_list:
             self.open_browser_item()
 
