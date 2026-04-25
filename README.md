@@ -1,6 +1,6 @@
 # Lysn - CLI Music Player
 
-[![Version](https://img.shields.io/badge/version-0.2.5-blue?style=for-the-badge)](https://github.com/WattoX00/lysn/releases/tag/v0.2.5)
+[![Version](https://img.shields.io/badge/version-0.2.6-blue?style=for-the-badge)](https://github.com/WattoX00/lysn/releases/tag/v0.2.6)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue?style=for-the-badge)
 [![PyPI](https://img.shields.io/pypi/v/lysn?style=for-the-badge)](https://pypi.org/project/lysn/)
 ![Status](https://img.shields.io/badge/status-active-success?style=for-the-badge)
