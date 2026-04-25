@@ -504,6 +504,56 @@ class Lysn(App):
                 return
             return
 
+    def get_song_duration(self, path):
+        try:
+            media = vlc.Media(str(path))
+            media.parse()
+            duration = media.get_duration() // 1000
+            if duration <= 0:
+                return "00:00", 0
+            return f"{duration//60:02}:{duration%60:02}", duration
+        except:
+            return "00:00", 0
+
+    def refresh_list(self):
+        items = sorted(
+            self.current_path.iterdir(),
+            key=lambda x: (x.is_file(), x.name.lower())
+        )
+
+        if getattr(self, "_last_album_items", None) == items:
+            return
+
+        self._last_album_items = items
+        self.album_list.clear()
+
+        # if inside album, calculate durations
+        if self.current_path != MUSIC_DIR:
+            total_seconds = 0
+            song_entries = []
+
+            for item in items:
+                if item.is_file():
+                    dur_str, dur_sec = self.get_song_duration(item)
+                    total_seconds += dur_sec
+                    song_entries.append((item, dur_str))
+                else:
+                    song_entries.append((item, None))
+
+            total_str = f"{total_seconds//60:02}:{total_seconds%60:02}"
+            self.album_list.append(ListItem(Label(f"[TOTAL] {total_str}")))
+
+            for item, dur in song_entries:
+                if item.is_dir():
+                    label = f"[DIR] {item.name}"
+                else:
+                    label = f"{item.stem:<40} {dur}"
+                self.album_list.append(ListItem(Label(label)))
+        else:
+            for item in items:
+                label = f"[DIR] {item.name}" if item.is_dir() else item.stem
+                self.album_list.append(ListItem(Label(label)))
+
     # Player bar
     def action_playsong(self) -> None:
         self.play_current_song()
