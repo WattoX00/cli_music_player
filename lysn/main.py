@@ -344,8 +344,9 @@ class Lysn(App):
 
             if selected.is_file():
                 songs = sorted(self.get_album_songs())
-                start_index = songs.index(selected)
-                self.play_song_list(songs, start_index=start_index-1)
+                offset = 1 if self.current_path != MUSIC_DIR else 0
+                start_index = self.album_list.index - offset
+                self.play_song_list(songs, start_index=start_index)
             else:
                 self.open_album_item()
 
